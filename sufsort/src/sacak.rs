@@ -348,16 +348,16 @@ fn induce_suffix_array_s_one(suffix_array: &mut [i32], data: &[i32], suffix: boo
         if d >= 0 {
             // suffix_array[c] is borrowed by the right neigbor bucket. Shift-right the items in
             // the right neighbor bucket.
-            let mut foo = suffix_array[c as usize];
+            let mut tmp = suffix_array[c as usize];
             let mut h: i32 = c + 1;
             while suffix_array[h as usize] >= 0 || suffix_array[h as usize] == EMPTY as i32 {
                 let bar = suffix_array[h as usize];
-                suffix_array[h as usize] = foo;
-                foo = bar;
+                suffix_array[h as usize] = tmp;
+                tmp = bar;
 
                 h += 1;
             }
-            suffix_array[h as usize] = foo;
+            suffix_array[h as usize] = tmp;
             if h > i {
                 step = 0;
             }
@@ -449,16 +449,16 @@ fn induce_suffix_array_l_one(suffix_array: &mut [i32], data: &[i32], suffix: boo
         if d >= 0 {
             // suffix_array[c] is borrowed by the left neighbor bucket. Shift-left the items in the
             // left neighbor bucket.
-            let mut foo = suffix_array[c as usize];
+            let mut tmp = suffix_array[c as usize];
             let mut h: i32 = c - 1;
             while suffix_array[h as usize] >= 0 || suffix_array[h as usize] == EMPTY as i32 {
                 let bar = suffix_array[h as usize];
-                suffix_array[h as usize] = foo;
-                foo = bar;
+                suffix_array[h as usize] = tmp;
+                tmp = bar;
 
                 h -= 1;
             }
-            suffix_array[h as usize] = foo;
+            suffix_array[h as usize] = tmp;
             if h < i {
                 step = 0;
             }
@@ -544,16 +544,16 @@ fn put_substring_one(suffix_array: &mut [i32], data: &[i32]) {
             if suffix_array[c as usize] >= 0 {
                 // suffix_array[c] is borrowed by the right neighbor bucket. Shift-right the items
                 // in the right neighbor bocket.
-                let mut foo: i32 = suffix_array[c as usize];
+                let mut tmp: i32 = suffix_array[c as usize];
                 let mut h: i32 = c + 1;
                 while suffix_array[h as usize] >= 0 {
                     let bar = suffix_array[h as usize];
-                    suffix_array[h as usize] = foo;
-                    foo = bar;
+                    suffix_array[h as usize] = tmp;
+                    tmp = bar;
 
                     h += 1;
                 }
-                suffix_array[h as usize] = foo;
+                suffix_array[h as usize] = tmp;
 
                 suffix_array[c as usize] = EMPTY as i32;
             }
