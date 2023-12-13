@@ -527,8 +527,8 @@ fn induce_suffix_array_l_one(suffix_array: &mut [i32], data: &[i32], suffix: boo
 }
 
 fn put_substring_one(suffix_array: &mut [i32], data: &[i32]) {
-    for i in 0..data.len() {
-        suffix_array[i] = EMPTY as i32;
+    for x in suffix_array.iter_mut().take(data.len()) {
+        *x = EMPTY as i32;
     }
 
     let mut c1: i32 = data[data.len() - 2];
