@@ -2,7 +2,8 @@
 //
 // SPDX-License-Identifier: LicenseRef-Proprietary
 
-use std::mem;
+use alloc::{vec, vec::Vec};
+use core::mem;
 
 // This algorithm casts u32s to usizes for the purpose of indexing. Because of these casts, any
 // target where the size of a usize is less than the size of a u32 will produce unexpected (albeit

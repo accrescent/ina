@@ -2,6 +2,8 @@
 //
 // SPDX-License-Identifier: LicenseRef-Proprietary
 
+use alloc::vec::Vec;
+
 use crate::sacak;
 
 /// A suffix array for a byte string.
