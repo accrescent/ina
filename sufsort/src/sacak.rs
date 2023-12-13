@@ -430,7 +430,6 @@ fn induce_suffix_array_l_one(suffix_array: &mut [i32], data: &[i32], suffix: boo
     let mut step: i32;
     while i < data.len() as i32 {
         step = 1;
-        //let j = suffix_array[i as usize] - 1;
         let j = suffix_array[i as usize].wrapping_sub(1);
         if suffix_array[i as usize] <= 0 {
             i += step;
