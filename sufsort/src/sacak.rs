@@ -814,13 +814,6 @@ fn induce_suffix_array_l_zero(
 fn put_substring_zero(suffix_array: &mut [u32], data: &[u8], bucket: &mut [u32]) {
     get_buckets(data, bucket, true);
 
-    // Set each item in the suffix array as empty
-    //
-    // TODO: Remove this emptying if it's redundant.
-    for x in suffix_array.iter_mut() {
-        *x = 0;
-    }
-
     // The penultimate element in `data` is L-type by definition
     let mut successive_type = CharType::L;
 
