@@ -1,4 +1,11 @@
+# Copyright 2023 Logan Magee
+#
+# SPDX-License-Identifier: LicenseRef-Proprietary
+
 [package]
 name = "sufsort"
 version = "0.0.0"
 edition = "2021"
+
+[dependencies]
+bytemuck = "1.14.0"
