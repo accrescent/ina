@@ -2,6 +2,8 @@
 //
 // SPDX-License-Identifier: LicenseRef-Proprietary
 
+use std::mem;
+
 // This algorithm casts u32s to usizes for the purpose of indexing. Because of these casts, any
 // target where the size of a usize is less than the size of a u32 will produce unexpected (albeit
 // not undefined) behavior. To prevent this, cause a compiler error on such targets.
@@ -351,9 +353,7 @@ fn induce_suffix_array_s_one(suffix_array: &mut [i32], data: &[i32], suffix: boo
             let mut tmp = suffix_array[c as usize];
             let mut h: i32 = c + 1;
             while suffix_array[h as usize] >= 0 || suffix_array[h as usize] == EMPTY as i32 {
-                let bar = suffix_array[h as usize];
-                suffix_array[h as usize] = tmp;
-                tmp = bar;
+                mem::swap(&mut suffix_array[h as usize], &mut tmp);
 
                 h += 1;
             }
@@ -452,9 +452,7 @@ fn induce_suffix_array_l_one(suffix_array: &mut [i32], data: &[i32], suffix: boo
             let mut tmp = suffix_array[c as usize];
             let mut h: i32 = c - 1;
             while suffix_array[h as usize] >= 0 || suffix_array[h as usize] == EMPTY as i32 {
-                let bar = suffix_array[h as usize];
-                suffix_array[h as usize] = tmp;
-                tmp = bar;
+                mem::swap(&mut suffix_array[h as usize], &mut tmp);
 
                 h -= 1;
             }
@@ -547,9 +545,7 @@ fn put_substring_one(suffix_array: &mut [i32], data: &[i32]) {
                 let mut tmp: i32 = suffix_array[c as usize];
                 let mut h: i32 = c + 1;
                 while suffix_array[h as usize] >= 0 {
-                    let bar = suffix_array[h as usize];
-                    suffix_array[h as usize] = tmp;
-                    tmp = bar;
+                    mem::swap(&mut suffix_array[h as usize], &mut tmp);
 
                     h += 1;
                 }
