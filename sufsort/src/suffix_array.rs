@@ -93,4 +93,11 @@ mod tests {
 
         assert!(!sa.contains(b"times"));
     }
+
+    #[test]
+    #[should_panic]
+    fn no_sentinel() {
+        let data = b"Hello, world!";
+        let _ = SuffixArray::new(data);
+    }
 }
