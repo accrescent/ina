@@ -67,7 +67,7 @@ fn sacak_level_zero(data: &[u8], suffix_array: &mut [u32]) {
     // Recurse if the names are not yet unique
     if name_counter < n1 {
         let (suffix_array, data) = suffix_array.split_at_mut(suffix_array.len() - n1 as usize);
-        sacak_recursive(suffix_array, bytemuck::cast_slice::<u32, u8>(data), 1);
+        sacak_recursive(suffix_array, bytemuck::cast_slice::<u32, u8>(data));
     } else {
         // Get the suffix array of s1 directly
         for i in 0..n1 {
@@ -83,7 +83,7 @@ fn sacak_level_zero(data: &[u8], suffix_array: &mut [u32]) {
     induce_suffix_array_s_zero(suffix_array, data, &mut bucket, true);
 }
 
-fn sacak_recursive(suffix_array: &mut [u32], data: &[u8], level: u8) {
+fn sacak_recursive(suffix_array: &mut [u32], data: &[u8]) {
     put_substring_one(
         bytemuck::cast_slice_mut::<u32, i32>(suffix_array),
         bytemuck::cast_slice::<u8, i32>(data),
@@ -119,11 +119,7 @@ fn sacak_recursive(suffix_array: &mut [u32], data: &[u8], level: u8) {
     // Recurse if the names are not yet unique
     if name_counter < n1 {
         let (suffix_array, data) = suffix_array.split_at_mut(suffix_array.len() - n1 as usize);
-        sacak_recursive(
-            suffix_array,
-            bytemuck::cast_slice::<u32, u8>(data),
-            level + 1,
-        );
+        sacak_recursive(suffix_array, bytemuck::cast_slice::<u32, u8>(data));
     } else {
         // Get the suffix array of s1 directly
         for i in 0..n1 {
