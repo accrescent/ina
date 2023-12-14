@@ -17,5 +17,8 @@ criterion = "0.5.1"
 name = "suffix_array"
 harness = false
 
+[lints.rust]
+missing_docs = "warn"
+
 [lints.clippy]
 missing_assert_message = "warn"

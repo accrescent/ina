@@ -2,6 +2,8 @@
 //
 // SPDX-License-Identifier: LicenseRef-Proprietary
 
+#![allow(missing_docs)]
+
 use std::{fs::File, io::Read};
 
 use criterion::{criterion_group, criterion_main, BenchmarkId, Criterion, Throughput};
