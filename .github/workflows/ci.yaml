@@ -1,0 +1,17 @@
+# Copyright 2023 Logan Magee
+#
+# SPDX-License-Identifier: LicenseRef-Proprietary
+
+name: Check code
+
+on: [push, pull_request]
+
+env:
+  RUSTFLAGS: "-Dwarnings"
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: cargo clippy --all-targets
