@@ -16,3 +16,6 @@ criterion = "0.5.1"
 [[bench]]
 name = "suffix_array"
 harness = false
+
+[lints.clippy]
+missing_assert_message = "warn"
