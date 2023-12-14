@@ -34,8 +34,6 @@ impl<'a> SuffixArray<'a> {
     /// ```
     #[must_use]
     pub fn new(data: &'a [u8]) -> Self {
-        assert_eq!(data[data.len() - 1], 0);
-
         let inner = sacak::sacak(data);
 
         Self { data, inner }
