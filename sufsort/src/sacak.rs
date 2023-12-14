@@ -33,7 +33,7 @@ const EMPTY: u32 = 1 << (u32::BITS - 1);
 ///
 /// [article]: https://doi.org/10.1145/2493175.2493180
 pub(crate) fn sacak(data: &[u8]) -> Vec<u32> {
-    assert_eq!(data[data.len() - 1], 0);
+    assert_eq!(data[data.len() - 1], 0, "last element in `data` must be 0");
 
     let mut suffix_array = vec![0; data.len()];
 
