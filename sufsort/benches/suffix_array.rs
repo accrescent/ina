@@ -12,8 +12,8 @@ use sufsort::SuffixArray;
 const DATA_PATH: &str = "benches/testdata/pizzachili-pitches.data";
 const CHUNK_SIZE: u64 = 512;
 
-fn new(c: &mut Criterion) {
-    let mut group = c.benchmark_group("new");
+fn construct(c: &mut Criterion) {
+    let mut group = c.benchmark_group("construct");
 
     let mut file = File::open(DATA_PATH).unwrap();
     let file_size = file.metadata().unwrap().len();
@@ -60,5 +60,5 @@ fn new(c: &mut Criterion) {
     group.finish();
 }
 
-criterion_group!(benches, new);
+criterion_group!(benches, construct);
 criterion_main!(benches);
