@@ -4,6 +4,7 @@
 
 [package]
 name = "sufsort"
+authors = ["Logan Magee"]
 edition = "2021"
 
 [dependencies]
