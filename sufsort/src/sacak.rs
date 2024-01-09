@@ -33,13 +33,21 @@ const EMPTY: u32 = 1 << (u32::BITS - 1);
 ///
 /// [article]: https://doi.org/10.1145/2493175.2493180
 pub(crate) fn sacak(data: &[u8]) -> Vec<u32> {
-    assert_eq!(data[data.len() - 1], 0, "last element in `data` must be 0");
+    if data.is_empty() {
+        Vec::new()
+    } else {
+        assert_eq!(data[data.len() - 1], 0, "last element in `data` must be 0");
 
-    let mut suffix_array = vec![0; data.len()];
+        if data.len() == 1 {
+            vec![0]
+        } else {
+            let mut suffix_array = vec![0; data.len()];
 
-    sacak_level_zero(data, &mut suffix_array);
+            sacak_level_zero(data, &mut suffix_array);
 
-    suffix_array
+            suffix_array
+        }
+    }
 }
 
 fn sacak_level_zero(data: &[u8], suffix_array: &mut [u32]) {
@@ -885,5 +893,21 @@ mod tests {
             suffix_array,
             vec![14, 7, 6, 13, 5, 0, 12, 1, 11, 2, 3, 4, 9, 10, 8],
         );
+    }
+
+    #[test]
+    fn empty_string() {
+        let text = "";
+        let suffix_array = sacak(text.as_bytes());
+
+        assert_eq!(suffix_array, vec![]);
+    }
+
+    #[test]
+    fn only_sentinel() {
+        let text = "\0";
+        let suffix_array = sacak(text.as_bytes());
+
+        assert_eq!(suffix_array, vec![0]);
     }
 }
