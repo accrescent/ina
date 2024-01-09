@@ -879,8 +879,8 @@ mod tests {
         let suffix_array = sacak(text.as_bytes());
 
         assert_eq!(
-            suffix_array,
-            vec![13, 6, 12, 5, 0, 11, 1, 10, 2, 3, 4, 8, 9, 7],
+            &suffix_array,
+            &[13, 6, 12, 5, 0, 11, 1, 10, 2, 3, 4, 8, 9, 7],
         );
     }
 
@@ -890,8 +890,8 @@ mod tests {
         let suffix_array = sacak(text.as_bytes());
 
         assert_eq!(
-            suffix_array,
-            vec![14, 7, 6, 13, 5, 0, 12, 1, 11, 2, 3, 4, 9, 10, 8],
+            &suffix_array,
+            &[14, 7, 6, 13, 5, 0, 12, 1, 11, 2, 3, 4, 9, 10, 8],
         );
     }
 
@@ -900,7 +900,7 @@ mod tests {
         let text = "";
         let suffix_array = sacak(text.as_bytes());
 
-        assert_eq!(suffix_array, vec![]);
+        assert_eq!(&suffix_array, &[]);
     }
 
     #[test]
@@ -908,6 +908,6 @@ mod tests {
         let text = "\0";
         let suffix_array = sacak(text.as_bytes());
 
-        assert_eq!(suffix_array, vec![0]);
+        assert_eq!(&suffix_array, &[0]);
     }
 }
