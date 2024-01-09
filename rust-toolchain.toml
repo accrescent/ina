@@ -1,0 +1,7 @@
+# Copyright 2023 Logan Magee
+#
+# SPDX-License-Identifier: LicenseRef-Proprietary
+
+[toolchain]
+channel = "1.75.0"
+profile = "default"
