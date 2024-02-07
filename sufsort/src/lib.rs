@@ -69,4 +69,4 @@ extern crate alloc;
 mod sacak;
 mod suffix_array;
 
-pub use suffix_array::SuffixArray;
+pub use suffix_array::{Substring, SuffixArray};
