@@ -1,0 +1,25 @@
+# Copyright 2024 Logan Magee
+#
+# SPDX-License-Identifier: LicenseRef-Proprietary
+
+[package]
+name = "ina"
+authors = ["Logan Magee"]
+edition = "2021"
+
+[dependencies]
+byteorder = "1.5.0"
+integer-encoding = "4.0.0"
+sufsort = { path = "../sufsort", optional = true }
+zstd = { version = "0.13.0", default-features = false }
+
+[dev-dependencies]
+blake3 = "1.5.0"
+
+[features]
+default = ["diff", "patch"]
+diff = ["sufsort"]
+patch = []
+
+[lints.rust]
+missing_docs = "warn"

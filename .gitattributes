@@ -1,0 +1,6 @@
+# Copyright 2024 Logan Magee
+#
+# SPDX-License-Identifier: LicenseRef-Proprietary
+
+ina/tests/testdata/gcc-13.2.1 filter=lfs diff=lfs merge=lfs -text
+ina/tests/testdata/gcc-13.1.1 filter=lfs diff=lfs merge=lfs -text
