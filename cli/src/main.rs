@@ -13,6 +13,7 @@ use anyhow::Context;
 use clap::{Parser, Subcommand};
 use ina::Patcher;
 
+/// Binary diffing and patching designed for executables
 #[derive(Parser)]
 #[command(display_name("ina"), version)]
 struct Args {
