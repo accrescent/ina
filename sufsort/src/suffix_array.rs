@@ -8,6 +8,7 @@ use core::{cmp::Ordering, ops::Deref};
 use crate::sacak;
 
 /// A suffix array for a byte string.
+#[derive(Clone, Debug, Eq, Hash, Ord, PartialEq, PartialOrd)]
 pub struct SuffixArray<'a> {
     data: &'a [u8],
     inner: Vec<u32>,
@@ -181,7 +182,7 @@ fn common_prefix_len(a: &[u8], b: &[u8]) -> usize {
 /// assert_eq!(substring.deref(), b"wor");
 /// assert_eq!(substring.position(), 7);
 /// ```
-#[derive(Debug, PartialEq)]
+#[derive(Clone, Copy, Debug, Eq, Hash, Ord, PartialEq, PartialOrd)]
 pub struct Substring<'a> {
     position: usize,
     data: &'a [u8],
