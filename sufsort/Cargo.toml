@@ -6,6 +6,7 @@
 name = "sufsort"
 authors = ["Logan Magee"]
 edition = "2021"
+publish = false
 
 [dependencies]
 bytemuck = "1.14.3"
