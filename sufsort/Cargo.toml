@@ -6,6 +6,7 @@
 name = "sufsort"
 authors = ["Logan Magee"]
 edition = "2021"
+license-file = "LICENSES/LicenseRef-Proprietary.txt"
 publish = false
 
 [dependencies]
