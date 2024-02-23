@@ -14,6 +14,7 @@ use clap::{Parser, Subcommand};
 use ina::Patcher;
 
 #[derive(Parser)]
+#[command(display_name("ina"), version)]
 struct Args {
     #[command(subcommand)]
     command: Command,
