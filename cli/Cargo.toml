@@ -1,0 +1,19 @@
+# Copyright 2024 Logan Magee
+#
+# SPDX-License-Identifier: LicenseRef-Proprietary
+
+[package]
+name = "cli"
+version = "0.0.0"
+edition = "2021"
+license-file = "LICENSES/LicenseRef-Proprietary.txt"
+publish = false
+
+[[bin]]
+name = "ina"
+path = "src/main.rs"
+
+[dependencies]
+anyhow = "1.0.80"
+clap = { version = "4.5.1", features = ["derive"] }
+ina = { path = "../ina" }
