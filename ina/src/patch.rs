@@ -6,7 +6,7 @@ use std::{
     cmp,
     error::Error,
     fmt::{self, Display, Formatter},
-    io::{self, BufReader, ErrorKind, Read, Seek, SeekFrom},
+    io::{self, BufReader, ErrorKind, Read, Seek, SeekFrom, Write},
 };
 
 use byteorder::{LittleEndian, ReadBytesExt};
@@ -225,4 +225,41 @@ where
             }
         }
     }
+}
+
+/// Reconstructs a new blob from and old blob and a patch
+///
+///
+/// This is a convenience method for creating a [`Patcher`] and reading it to completion. If
+/// successful, returns the number of bytes read from the patch file.
+///
+/// # Errors
+///
+/// Returns an error if an I/O occurs while reading the patch metadata of if the patch metadata is
+/// invalid.
+///
+/// # Examples
+///
+/// ```no_run
+/// use std::fs::File;
+///
+/// # fn main() -> Result<(), Box<dyn std::error::Error>> {
+/// let old = File::open("app-v1.exe")?;
+/// let patch = File::open("app-v1-to-v2.ina")?;
+/// let mut new = File::create("app-v2.exe")?;
+///
+/// ina::patch(old, patch, &mut new)?;
+///
+/// # Ok(())
+/// # }
+/// ```
+pub fn patch<O, P, W>(old: O, patch: P, new: &mut W) -> Result<u64, PatchError>
+where
+    O: Read + Seek,
+    P: Read,
+    W: Write + ?Sized,
+{
+    let mut patcher = Patcher::new(old, patch)?;
+
+    Ok(io::copy(&mut patcher, new)?)
 }

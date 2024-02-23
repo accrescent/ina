@@ -39,9 +39,7 @@
 //! let patch = File::open("app-v1-to-v2.ina")?;
 //! let mut new = File::create("app-v2.exe")?;
 //!
-//! let mut patcher = Patcher::new(old, patch)?;
-//!
-//! io::copy(&mut patcher, &mut new)?;
+//! ina::patch(old, patch, &mut new)?;
 //!
 //! # Ok(())
 //! # }
@@ -59,4 +57,4 @@ mod patch;
 #[cfg(feature = "diff")]
 pub use diff::diff;
 #[cfg(feature = "patch")]
-pub use patch::{PatchError, Patcher};
+pub use patch::{patch, PatchError, Patcher};
