@@ -10,7 +10,6 @@ use std::{
 };
 
 use blake3::Hasher;
-use ina::Patcher;
 
 const OLD_FILE_NAME: &str = "gcc-13.1.1";
 const NEW_FILE_NAME: &str = "gcc-13.2.1";
@@ -38,8 +37,7 @@ fn gcc() -> Result<(), Box<dyn Error>> {
         let old = File::open(test_data_dir.join(OLD_FILE_NAME))?;
         let patch = File::open(workspace_dir.join(PATCH_FILE_NAME))?;
         let mut new = File::create(workspace_dir.join(NEW_FILE_NAME))?;
-        let mut patcher = Patcher::new(old, patch)?;
-        io::copy(&mut patcher, &mut new)?;
+        ina::patch(old, patch, &mut new)?;
     }
 
     // Verify that patching worked correctly by comparing the hashes of the new and reconstructed

@@ -4,14 +4,12 @@
 
 use std::{
     fs::{self, File},
-    io,
     io::Read,
     path::PathBuf,
 };
 
 use anyhow::Context;
 use clap::{Parser, Subcommand};
-use ina::Patcher;
 
 /// Binary diffing and patching designed for executables
 #[derive(Parser)]
@@ -80,10 +78,8 @@ fn main() -> anyhow::Result<()> {
             let mut out_file = File::create(&out)
                 .with_context(|| format!("Failed to create out file '{}'", out.display()))?;
 
-            let mut patcher =
-                Patcher::new(old_file, patch_file).context("Failed to read patch file")?;
-            io::copy(&mut patcher, &mut out_file)
-                .context("I/O error occurred while applying patch file")?;
+            ina::patch(old_file, patch_file, &mut out_file)
+                .context("Failed to apply patch file")?;
         }
     }
 
