@@ -2,4 +2,8 @@
 #
 # SPDX-License-Identifier: LicenseRef-Proprietary
 
+/.gradle
+/.idea
+/build
+/local.properties
 /target

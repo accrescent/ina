@@ -1,0 +1,11 @@
+# Copyright 2024 Logan Magee
+#
+# SPDX-License-Identifier: LicenseRef-Proprietary
+
+[versions]
+agp = "8.2.2"
+kotlin = "1.9.22"
+
+[plugins]
+jetbrains-kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
+android-library = { id = "com.android.library", version.ref = "agp" }
