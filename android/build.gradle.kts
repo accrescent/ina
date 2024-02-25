@@ -40,6 +40,10 @@ android {
     }
 }
 
+kotlin {
+    explicitApi()
+}
+
 tasks.register<Exec>("buildJniLibs") {
     // Obtain the host tag for the current system so we can find the proper toolchain directory
     //
