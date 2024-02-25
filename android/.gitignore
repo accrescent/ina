@@ -3,3 +3,4 @@
 # SPDX-License-Identifier: LicenseRef-Proprietary
 
 /build
+/src/main/jniLibs

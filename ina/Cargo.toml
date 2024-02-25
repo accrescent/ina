@@ -9,6 +9,9 @@ edition = "2021"
 license-file = "LICENSES/LicenseRef-Proprietary.txt"
 publish = false
 
+[lib]
+crate-type = ["cdylib", "lib"]
+
 [dependencies]
 byteorder = "1.5.0"
 integer-encoding = "4.0.0"
