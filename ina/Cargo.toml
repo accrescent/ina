@@ -13,8 +13,10 @@ publish = false
 crate-type = ["cdylib", "lib"]
 
 [dependencies]
+bytemuck = { version = "1.14.3", optional = true }
 byteorder = "1.5.0"
 integer-encoding = "4.0.0"
+jni = { version = "0.21.1", optional = true }
 sufsort = { path = "../sufsort", optional = true }
 zstd = { version = "0.13.0", default-features = false }
 
@@ -24,7 +26,13 @@ blake3 = "1.5.1"
 [features]
 default = ["diff", "patch"]
 diff = ["sufsort"]
+java-ffi = ["bytemuck", "jni"]
 patch = []
 
 [lints.rust]
 missing_docs = "warn"
+unsafe_op_in_unsafe_fn = "warn"
+
+[lints.clippy]
+clone_on_ref_ptr = "warn"
+undocumented_unsafe_blocks = "warn"
