@@ -16,7 +16,7 @@ sufsort = { path = "../sufsort", optional = true }
 zstd = { version = "0.13.0", default-features = false }
 
 [dev-dependencies]
-blake3 = "1.5.0"
+blake3 = "1.5.1"
 
 [features]
 default = ["diff", "patch"]
