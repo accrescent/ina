@@ -233,7 +233,7 @@ where
 ///
 ///
 /// This is a convenience method for creating a [`Patcher`] and reading it to completion. If
-/// successful, returns the number of bytes read from the patch file.
+/// successful, returns the number of bytes written to `new`.
 ///
 /// # Errors
 ///
