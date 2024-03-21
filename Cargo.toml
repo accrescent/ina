@@ -10,3 +10,7 @@ resolver = "2"
 strip = true
 lto = true
 codegen-units = 1
+
+[profile.cdylib-release]
+inherits = "release"
+panic = "abort"

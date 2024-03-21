@@ -100,7 +100,8 @@ tasks.register("buildJniLibs") {
                 "java-ffi,patch",
                 "--target",
                 "aarch64-linux-android",
-                "--release",
+                "--profile",
+                "cdylib-release",
             )
         }
         exec {
@@ -118,7 +119,8 @@ tasks.register("buildJniLibs") {
                 "java-ffi,patch",
                 "--target",
                 "x86_64-linux-android",
-                "--release",
+                "--profile",
+                "cdylib-release",
             )
         }
         exec {
@@ -136,22 +138,23 @@ tasks.register("buildJniLibs") {
                 "java-ffi,patch",
                 "--target",
                 "i686-linux-android",
-                "--release",
+                "--profile",
+                "cdylib-release",
             )
         }
     }
 
     doLast {
         copy {
-            from("$rootDir/target/aarch64-linux-android/release/libina.so")
+            from("$rootDir/target/aarch64-linux-android/cdylib-release/libina.so")
             into("$projectDir/src/main/jniLibs/arm64-v8a")
         }
         copy {
-            from("$rootDir/target/x86_64-linux-android/release/libina.so")
+            from("$rootDir/target/x86_64-linux-android/cdylib-release/libina.so")
             into("$projectDir/src/main/jniLibs/x86_64")
         }
         copy {
-            from("$rootDir/target/i686-linux-android/release/libina.so")
+            from("$rootDir/target/i686-linux-android/cdylib-release/libina.so")
             into("$projectDir/src/main/jniLibs/x86")
         }
     }
