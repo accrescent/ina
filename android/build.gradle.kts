@@ -46,10 +46,10 @@ android {
     testOptions {
         managedDevices {
             localDevices {
-                create("nexusOneApi34") {
+                create("nexusOneApi30") {
                     device = "Nexus One"
-                    apiLevel = 34
-                    systemImageSource = "aosp"
+                    apiLevel = 30
+                    systemImageSource = "aosp-atd"
                 }
             }
         }
@@ -82,6 +82,7 @@ tasks.register("buildJniLibs") {
 
     val aarch64CcPath = "$toolchainDir/aarch64-linux-android$api-clang"
     val x8664CcPath = "$toolchainDir/x86_64-linux-android$api-clang"
+    val i686CcPath = "$toolchainDir/i686-linux-android$api-clang"
 
     doFirst {
         exec {
@@ -120,6 +121,24 @@ tasks.register("buildJniLibs") {
                 "--release",
             )
         }
+        exec {
+            environment("AR", "$toolchainDir/llvm-ar")
+            environment("CARGO_TARGET_I686_LINUX_ANDROID_LINKER", i686CcPath)
+            environment("CC_i686-linux-android", i686CcPath)
+
+            commandLine(
+                "cargo",
+                "build",
+                "-p",
+                "ina",
+                "--no-default-features",
+                "--features",
+                "java-ffi,patch",
+                "--target",
+                "i686-linux-android",
+                "--release",
+            )
+        }
     }
 
     doLast {
@@ -130,6 +149,10 @@ tasks.register("buildJniLibs") {
         copy {
             from("$rootDir/target/x86_64-linux-android/release/libina.so")
             into("$projectDir/src/main/jniLibs/x86_64")
+        }
+        copy {
+            from("$rootDir/target/i686-linux-android/release/libina.so")
+            into("$projectDir/src/main/jniLibs/x86")
         }
     }
 }
