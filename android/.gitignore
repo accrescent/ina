@@ -1,0 +1,6 @@
+# Copyright 2024 Logan Magee
+#
+# SPDX-License-Identifier: LicenseRef-Proprietary
+
+/build
+/src/main/jniLibs
