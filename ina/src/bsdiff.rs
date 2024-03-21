@@ -4,6 +4,8 @@
 
 use sufsort::SuffixArray;
 
+const NON_MATCHING_BYTES_THRESHOLD: usize = 8;
+
 #[derive(Clone, Copy)]
 pub(crate) struct Match {
     add_old_pos: usize,
@@ -72,7 +74,9 @@ impl<'a> Iterator for MatchMaker<'a> {
                     scsc += 1;
                 }
 
-                if (self.len == old_score && self.len != 0) || self.len > old_score + 8 {
+                if (self.len == old_score && self.len != 0)
+                    || self.len > old_score + NON_MATCHING_BYTES_THRESHOLD
+                {
                     break;
                 }
 
