@@ -148,16 +148,21 @@ where
     O: Read + Seek,
     P: Read,
 {
-    fn read(&mut self, buf: &mut [u8]) -> io::Result<usize> {
-        loop {
-            match self.state {
+    fn read(&mut self, mut buf: &mut [u8]) -> io::Result<usize> {
+        let mut read_total = 0;
+
+        while !buf.is_empty() {
+            let read = match self.state {
                 PatcherState::AtNextControl => {
                     // Next is a control add field. Read the length of it and continue.
                     match self.patch.read_varint() {
-                        Ok(add_len) => self.state = PatcherState::Add(add_len),
+                        Ok(add_len) => {
+                            self.state = PatcherState::Add(add_len);
+                            0
+                        }
                         Err(e) => match e.kind() {
-                            ErrorKind::UnexpectedEof => break Ok(0),
-                            _ => break Err(e),
+                            ErrorKind::UnexpectedEof => break,
+                            _ => return Err(e),
                         },
                     }
                 }
@@ -188,11 +193,7 @@ where
                         self.state = PatcherState::Add(add_len - max_read_len);
                     }
 
-                    if max_read_len == 0 {
-                        continue;
-                    } else {
-                        break Ok(max_read_len);
-                    }
+                    max_read_len
                 }
                 PatcherState::Copy(copy_len) => {
                     // We're currently reading a copy field, so write the next bytes into the buffer
@@ -216,14 +217,15 @@ where
                         self.state = PatcherState::Copy(copy_len - max_read_len);
                     }
 
-                    if max_read_len == 0 {
-                        continue;
-                    } else {
-                        break Ok(max_read_len);
-                    }
+                    max_read_len
                 }
-            }
+            };
+
+            read_total += read;
+            buf = &mut buf[read..];
         }
+
+        Ok(read_total)
     }
 }
 
