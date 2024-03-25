@@ -16,6 +16,8 @@ import android.os.Messenger
 import android.os.ParcelFileDescriptor
 import android.os.ParcelFileDescriptor.AutoCloseInputStream
 import android.os.ParcelFileDescriptor.AutoCloseOutputStream
+import android.util.Log
+import java.security.GeneralSecurityException
 
 /**
  * Message ID indicating the message body is a patch request
@@ -31,6 +33,8 @@ public const val RESP_PATCH_SUCCESS: Int = 2
  * Message ID indicating the message body is a patch failure
  */
 public const val RESP_PATCH_FAILURE: Int = 3
+
+private const val TAG: String = "Ina"
 
 /**
  * A service that patches blobs using Ina patch files
@@ -81,6 +85,20 @@ public class PatchService : Service() {
     override fun onBind(intent: Intent): IBinder {
         messenger = Messenger(IncomingHandler())
         return messenger.binder
+    }
+
+    /**
+     * @suppress
+     */
+    override fun onCreate() {
+        // Prevent the service from starting if sandbox initialization fails so we never process
+        // untrusted data outside of a sandbox
+        when (Patcher.enableSandbox()) {
+            1 -> Log.i(TAG, "Successfully enabled seccomp sandbox")
+            0 -> throw GeneralSecurityException("Seccomp sandbox unavailable. This should never happen.")
+            -1 -> throw GeneralSecurityException("Seccomp sandbox initialization failed")
+            else -> throw GeneralSecurityException("Unknown seccomp sandbox error occurred. This should never happen.")
+        }
     }
 }
 

@@ -141,3 +141,15 @@ impl<'a> Write for OutputStream<'a> {
             .map_err(|e: JniError| IoError::other(e))
     }
 }
+
+#[cfg(feature = "sandbox")]
+#[no_mangle]
+extern "system" fn Java_app_accrescent_ina_Patcher_enableSandbox(
+    _env: JNIEnv,
+    _class: JClass,
+) -> jint {
+    match crate::sandbox::enable_for_patching() {
+        Ok(enabled) => jint::from(enabled),
+        Err(_) => -1,
+    }
+}

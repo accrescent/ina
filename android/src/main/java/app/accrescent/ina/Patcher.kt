@@ -24,5 +24,14 @@ internal class Patcher {
         @JvmStatic
         @Throws(IOException::class)
         external fun patch(oldFileFd: Int, patch: InputStream, out: OutputStream): Long
+
+        /**
+         * Enables the platform sandbox for patching operations
+         *
+         * @return 1 when the sandbox is successfully enabled, 0 when no supported sandbox exists
+         * for the current platform, and -1 if a supported sandbox is detected but enabling it fails
+         */
+        @JvmStatic
+        external fun enableSandbox(): Int
     }
 }
