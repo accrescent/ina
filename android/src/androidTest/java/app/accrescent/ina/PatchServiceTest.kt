@@ -75,7 +75,7 @@ class PatchServiceTest {
                 oldFileAsset.copyTo(oldFileInternal)
             }
         }
-        val oldFileFd = ParcelFileDescriptor.open(oldFile, MODE_READ_ONLY).detachFd()
+        val oldFileFd = ParcelFileDescriptor.open(oldFile, MODE_READ_ONLY)
 
         val descriptors = ParcelFileDescriptor.createPipe()
         val readDesc = descriptors[0]
@@ -97,7 +97,7 @@ class PatchServiceTest {
 
         val message = Message.obtain(null, MSG_PATCH)
         message.data = Bundle().apply {
-            putInt("oldFileFd", oldFileFd)
+            putParcelable("oldFileFd", oldFileFd)
             putParcelable("patchFd", readDesc)
             putParcelable("outFd", outFd)
         }

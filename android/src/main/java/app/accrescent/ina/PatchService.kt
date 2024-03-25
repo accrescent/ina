@@ -44,7 +44,9 @@ public class PatchService : Service() {
         override fun handleMessage(msg: Message) {
             when (msg.what) {
                 MSG_PATCH -> {
-                    val oldFileFd = msg.data.getInt("oldFileFd")
+                    val oldFileFd =
+                        msg.data.getParcelableCompat("oldFileFd", ParcelFileDescriptor::class.java)
+                            ?.detachFd() ?: return
                     val patchFd =
                         msg.data.getParcelableCompat("patchFd", ParcelFileDescriptor::class.java)
                     val outFd =

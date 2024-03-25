@@ -8,6 +8,6 @@ SPDX-License-Identifier: LicenseRef-Proprietary
 
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
     <application>
-        <service android:name=".PatchService" />
+        <service android:name=".PatchService" android:isolatedProcess="true" />
     </application>
 </manifest>
