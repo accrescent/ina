@@ -55,6 +55,8 @@ mod header;
 mod jni;
 #[cfg(feature = "patch")]
 mod patch;
+#[cfg(feature = "sandbox")]
+pub mod sandbox;
 
 #[cfg(feature = "diff")]
 pub use diff::diff;
