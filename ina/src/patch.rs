@@ -229,7 +229,7 @@ where
     }
 }
 
-/// Reconstructs a new blob from and old blob and a patch
+/// Reconstructs a new blob from an old blob and a patch
 ///
 ///
 /// This is a convenience method for creating a [`Patcher`] and reading it to completion. If
