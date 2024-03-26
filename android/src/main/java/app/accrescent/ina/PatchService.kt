@@ -22,17 +22,17 @@ import java.security.GeneralSecurityException
 /**
  * Message ID indicating the message body is a patch request
  */
-public const val MSG_PATCH: Int = 1
+internal const val MSG_PATCH: Int = 1
 
 /**
  * Message ID indicating the message body is a success response
  */
-public const val RESP_PATCH_SUCCESS: Int = 2
+internal const val RESP_PATCH_SUCCESS: Int = 2
 
 /**
  * Message ID indicating the message body is a patch failure
  */
-public const val RESP_PATCH_FAILURE: Int = 3
+internal const val RESP_PATCH_FAILURE: Int = 3
 
 private const val TAG: String = "Ina"
 
@@ -59,12 +59,12 @@ public class PatchService : Service() {
 
                     AutoCloseInputStream(patchFd).use { patch ->
                         AutoCloseOutputStream(outFd).use { out ->
-                            val read = Patcher.patch(oldFileFd, patch, out)
+                            val bytesWritten = Patcher.patch(oldFileFd, patch, out)
 
                             val response = Message.obtain().apply {
-                                if (read != -1L) {
+                                if (bytesWritten != -1L) {
                                     what = RESP_PATCH_SUCCESS
-                                    data.putLong("read", read)
+                                    data.putLong("bytesWritten", bytesWritten)
                                 } else {
                                     what = RESP_PATCH_FAILURE
                                 }
