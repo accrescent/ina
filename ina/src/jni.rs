@@ -22,7 +22,7 @@ unsafe extern "system" fn Java_app_accrescent_ina_Patcher_patch(
     _class: JClass,
     old_file_fd: jint,
     patch: JObject,
-    out: JObject,
+    new: JObject,
 ) -> jlong {
     // SAFETY: The caller guarantees that `old_file_fd` is an owned, open file descriptor
     let old_file = unsafe { File::from_raw_fd(old_file_fd) };
@@ -32,9 +32,9 @@ unsafe extern "system" fn Java_app_accrescent_ina_Patcher_patch(
         Err(_) => return -1,
     };
     let patch_stream = InputStream::new(Executor::new(Arc::clone(&vm)), patch);
-    let mut out_stream = OutputStream::new(Executor::new(vm), out);
+    let mut new_stream = OutputStream::new(Executor::new(vm), new);
 
-    match crate::patch(old_file, patch_stream, &mut out_stream) {
+    match crate::patch(old_file, patch_stream, &mut new_stream) {
         Ok(read) => read as jlong,
         Err(_) => -1,
     }

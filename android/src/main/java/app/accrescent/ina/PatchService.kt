@@ -53,13 +53,13 @@ public class PatchService : Service() {
                             ?.detachFd() ?: return
                     val patchFd =
                         msg.data.getParcelableCompat("patchFd", ParcelFileDescriptor::class.java)
-                    val outFd =
-                        msg.data.getParcelableCompat("outFd", ParcelFileDescriptor::class.java)
+                    val newFd =
+                        msg.data.getParcelableCompat("newFd", ParcelFileDescriptor::class.java)
                     val clientHandle = msg.replyTo
 
                     AutoCloseInputStream(patchFd).use { patch ->
-                        AutoCloseOutputStream(outFd).use { out ->
-                            val bytesWritten = Patcher.patch(oldFileFd, patch, out)
+                        AutoCloseOutputStream(newFd).use { new ->
+                            val bytesWritten = Patcher.patch(oldFileFd, patch, new)
 
                             val response = Message.obtain().apply {
                                 if (bytesWritten != -1L) {

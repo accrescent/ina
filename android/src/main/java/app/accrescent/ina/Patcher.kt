@@ -23,7 +23,7 @@ internal class Patcher {
          */
         @JvmStatic
         @Throws(IOException::class)
-        external fun patch(oldFileFd: Int, patch: InputStream, out: OutputStream): Long
+        external fun patch(oldFileFd: Int, patch: InputStream, new: OutputStream): Long
 
         /**
          * Enables the platform sandbox for patching operations

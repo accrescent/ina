@@ -164,7 +164,7 @@ private fun submitPatchRequestImpl(
         data = Bundle().apply {
             putParcelable("oldFileFd", oldFileFd)
             putParcelable("patchFd", patchFd)
-            putParcelable("outFd", newFd)
+            putParcelable("newFd", newFd)
         }
         replyTo = Messenger(ResponseHandler(onComplete))
     }
