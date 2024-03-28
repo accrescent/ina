@@ -19,7 +19,7 @@ import java.io.OutputStream
 import kotlin.concurrent.thread
 
 /**
- * The result of a patch operations
+ * The result of a patch operation
  */
 public sealed class PatchResult {
     /**
