@@ -62,7 +62,7 @@ class PatchServiceTest {
             { newFile.outputStream() },
         ) { res ->
             when (res) {
-                is PatchResult.Ok -> assertEquals(res.bytesWritten, EXPECTED_READ)
+                is PatchResult.Ok -> assertEquals(EXPECTED_READ, res.bytesWritten)
                 PatchResult.Error -> fail("Patch result is an error")
             }
 
