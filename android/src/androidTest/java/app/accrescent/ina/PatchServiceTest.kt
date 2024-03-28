@@ -50,6 +50,8 @@ class PatchServiceTest {
 
         val receivedResponse = ConditionVariable(false)
 
+        // Use the overload which adapts both streams to ParcelFileDescriptors to test the most
+        // complex code path
         submitPatchRequest(
             messenger,
             oldFile,
