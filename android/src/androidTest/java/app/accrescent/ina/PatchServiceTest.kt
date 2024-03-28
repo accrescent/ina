@@ -8,10 +8,13 @@ import android.content.Context
 import android.content.Intent
 import android.os.ConditionVariable
 import android.os.Messenger
+import android.os.ParcelFileDescriptor
+import android.os.ParcelFileDescriptor.MODE_READ_ONLY
 import androidx.test.core.app.ApplicationProvider
 import androidx.test.platform.app.InstrumentationRegistry
 import androidx.test.rule.ServiceTestRule
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertTrue
 import org.junit.Assert.fail
 import org.junit.Rule
 import org.junit.Test
@@ -32,7 +35,7 @@ class PatchServiceTest {
     val serviceRule = ServiceTestRule()
 
     @Test
-    fun testPatch() {
+    fun patchSucceeds() {
         val context = ApplicationProvider.getApplicationContext<Context>()
         val testContext = InstrumentationRegistry.getInstrumentation().context
         val serviceIntent = Intent(context, PatchService::class.java)
@@ -67,6 +70,40 @@ class PatchServiceTest {
                 .digest(File(context.cacheDir, NEW_FILE_NAME).readBytes())
                 .joinToString("") { "%02x".format(it) }
             assertEquals(EXPECTED_NEW_HASH, newHash)
+
+            receivedResponse.open()
+        }
+
+        receivedResponse.block()
+    }
+
+    @Test
+    fun patchFailsOnException() {
+        val context = ApplicationProvider.getApplicationContext<Context>()
+        val testContext = InstrumentationRegistry.getInstrumentation().context
+        val serviceIntent = Intent(context, PatchService::class.java)
+        val messenger = Messenger(serviceRule.bindService(serviceIntent))
+
+        // Copy old file from assets folder to internal storage so we can get a proper file
+        // descriptor
+        val oldFile = File(context.cacheDir, OLD_FILE_NAME)
+        FileOutputStream(oldFile).use { oldFileInternal ->
+            testContext.assets.open(OLD_FILE_NAME).use { oldFileAsset ->
+                oldFileAsset.copyTo(oldFileInternal)
+            }
+        }
+        val newFile = File(context.cacheDir, NEW_FILE_NAME)
+
+        val receivedResponse = ConditionVariable(false)
+
+        submitPatchRequest(
+            messenger,
+            oldFile,
+            { testContext.assets.open(PATCH_FILE_NAME) },
+            // The new file is read-only, which should cause writes to throw an IOException
+            ParcelFileDescriptor.open(newFile, MODE_READ_ONLY),
+        ) { res ->
+            assertTrue(res is PatchResult.Error)
 
             receivedResponse.open()
         }

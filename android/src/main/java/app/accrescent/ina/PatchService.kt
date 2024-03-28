@@ -17,6 +17,7 @@ import android.os.ParcelFileDescriptor
 import android.os.ParcelFileDescriptor.AutoCloseInputStream
 import android.os.ParcelFileDescriptor.AutoCloseOutputStream
 import android.util.Log
+import java.io.IOException
 import java.security.GeneralSecurityException
 
 /**
@@ -59,13 +60,17 @@ public class PatchService : Service() {
 
                     AutoCloseInputStream(patchFd).use { patch ->
                         AutoCloseOutputStream(newFd).use { new ->
-                            val bytesWritten = Patcher.patch(oldFileFd, patch, new)
-
                             val response = Message.obtain().apply {
-                                if (bytesWritten != -1L) {
-                                    what = RESP_PATCH_SUCCESS
-                                    data.putLong("bytesWritten", bytesWritten)
-                                } else {
+                                try {
+                                    val bytesWritten = Patcher.patch(oldFileFd, patch, new)
+
+                                    if (bytesWritten != -1L) {
+                                        what = RESP_PATCH_SUCCESS
+                                        data.putLong("bytesWritten", bytesWritten)
+                                    } else {
+                                        what = RESP_PATCH_FAILURE
+                                    }
+                                } catch (e: IOException) {
                                     what = RESP_PATCH_FAILURE
                                 }
                             }
