@@ -32,7 +32,6 @@
 //!
 //! ```no_run
 //! use std::{io, fs::File};
-//! use ina::Patcher;
 //!
 //! # fn main() -> Result<(), Box<dyn std::error::Error>> {
 //! let old = File::open("app-v1.exe")?;
