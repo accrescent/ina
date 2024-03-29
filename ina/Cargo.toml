@@ -29,7 +29,7 @@ blake3 = "1.5.1"
 
 [features]
 default = ["diff", "patch"]
-diff = ["sufsort"]
+diff = ["sufsort", "zstd/zstdmt"]
 java-ffi = ["bytemuck", "jni"]
 patch = []
 sandbox = ["libc", "seccompiler"]
