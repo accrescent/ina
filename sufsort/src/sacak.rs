@@ -38,15 +38,13 @@ pub(crate) fn sacak(data: &[u8]) -> Vec<u32> {
     } else {
         assert_eq!(data[data.len() - 1], 0, "last element in `data` must be 0");
 
-        if data.len() == 1 {
-            vec![0]
-        } else {
-            let mut suffix_array = vec![0; data.len()];
+        let mut suffix_array = vec![0; data.len()];
 
+        if data.len() != 1 {
             sacak_level_zero(data, &mut suffix_array);
-
-            suffix_array
         }
+
+        suffix_array
     }
 }
 
