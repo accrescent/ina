@@ -145,7 +145,7 @@ impl DiffConfig {
     /// Creates a new configuration for diff operations
     ///
     /// This configuration can be reused across diff operations.
-    pub fn new() -> Self {
+    pub const fn new() -> Self {
         Self {
             compress_threads: DEFAULT_COMPRESS_THREADS,
         }
