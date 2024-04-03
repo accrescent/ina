@@ -13,12 +13,6 @@ use crate::{
     header::{MAGIC, VERSION},
 };
 
-/// The default number of compression threads to create
-///
-/// We set this to 1 to ensure I/O and compression can run concurrently.
-const DEFAULT_COMPRESSION_THREADS: u32 = 1;
-const DEFAULT_COMPRESSION_LEVEL: i32 = 19;
-
 /// Constructs a patch between two blobs with default options
 ///
 /// Note that `old` MUST have a `0` appended to the end of the actual old blob for the algorithm to
@@ -148,8 +142,8 @@ impl DiffConfig {
     /// This configuration can be reused across diff operations.
     pub const fn new() -> Self {
         Self {
-            compression_threads: DEFAULT_COMPRESSION_THREADS,
-            compression_level: DEFAULT_COMPRESSION_LEVEL,
+            compression_threads: Self::DEFAULT_COMPRESSION_THREADS,
+            compression_level: Self::DEFAULT_COMPRESSION_LEVEL,
         }
     }
 
@@ -179,6 +173,17 @@ impl DiffConfig {
         self.compression_level = level;
         self
     }
+
+    /// The default number of compression threads to create
+    ///
+    /// We set this to 1 to ensure I/O and compression can run concurrently.
+    pub const DEFAULT_COMPRESSION_THREADS: u32 = 1;
+
+    /// The default compression level to use
+    ///
+    /// We set this to 19 because it obtains the highest compression ratio without incurring the
+    /// significant memory costs of higher levels.
+    pub const DEFAULT_COMPRESSION_LEVEL: i32 = 19;
 }
 
 impl Default for DiffConfig {
