@@ -22,18 +22,47 @@ struct Args {
 
 #[derive(Subcommand)]
 enum Command {
+    /// Generate a patch between two files
     Diff {
+        /// The path of the old file
         old: PathBuf,
+        /// The path of the new file
         new: PathBuf,
+        /// The path of the output patch file
         patch: PathBuf,
-        #[arg(long)]
+        /// The number of threads to use for compression
+        ///
+        /// Setting this to a value more than 0 allows compression to run on a separate thread than
+        /// I/O, significantly improving performance at a slight cost to maximum memory usage.
+        /// Values above 1 result in greatly diministing returns, so the default is recommended
+        /// unless testing proves higher performance with higher values.
+        ///
+        /// A value of 0 means that compression will run on the same thread as I/O, reducing
+        /// diffing speed but slightly lowering memory usage.
+        ///
+        /// Default: 1
+        #[arg(long, verbatim_doc_comment)]
         compression_threads: Option<u32>,
-        #[arg(long)]
+        /// The compression level to use for compressing the patch file
+        ///
+        /// The compression level can be set to any value between -7 and 22 inclusive. The most
+        /// positive number results in the highest compression ratio at the cost of speed, while
+        /// the least positive number results in the highest speed at the cost of compression
+        /// ratio. Any value outside of this range will be clamped to fit inside the range.
+        ///
+        /// Levels 20-22 result in significantly higher memory usage.
+        ///
+        /// Default: 19
+        #[arg(long, verbatim_doc_comment)]
         compression_level: Option<i32>,
     },
+    /// Reconstruct a new file from and old file and a patch
     Patch {
+        /// The path of the old file
         old: PathBuf,
+        /// The patch of the patch file
         patch: PathBuf,
+        /// The path of the output new file
         new: PathBuf,
     },
 }
