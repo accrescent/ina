@@ -10,6 +10,7 @@ use std::{
 
 use anyhow::Context;
 use clap::{Parser, Subcommand};
+use ina::DiffConfig;
 
 /// Binary diffing and patching designed for executables
 #[derive(Parser)]
@@ -25,6 +26,8 @@ enum Command {
         old: PathBuf,
         new: PathBuf,
         patch: PathBuf,
+        #[arg(long)]
+        compression_threads: Option<u32>,
     },
     Patch {
         old: PathBuf,
@@ -37,7 +40,12 @@ fn main() -> anyhow::Result<()> {
     let args = Args::parse();
 
     match args.command {
-        Command::Diff { old, new, patch } => {
+        Command::Diff {
+            old,
+            new,
+            patch,
+            compression_threads,
+        } => {
             let mut old_file = File::open(&old)
                 .with_context(|| format!("Failed to open old file '{}'", old.display()))?;
             let len: usize = old_file
@@ -67,7 +75,12 @@ fn main() -> anyhow::Result<()> {
             let mut patch_file = File::create(&patch)
                 .with_context(|| format!("Failed to create patch file '{}'", patch.display()))?;
 
-            ina::diff(&old_data, &new_data, &mut patch_file)
+            let mut diff_config = DiffConfig::default();
+            if let Some(threads) = compression_threads {
+                diff_config.compression_threads(threads);
+            }
+
+            ina::diff_with_config(&old_data, &new_data, &mut patch_file, &diff_config)
                 .context("I/O error occurred while generating patch file")?;
         }
         Command::Patch { old, patch, out } => {
