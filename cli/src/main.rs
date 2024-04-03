@@ -28,6 +28,8 @@ enum Command {
         patch: PathBuf,
         #[arg(long)]
         compression_threads: Option<u32>,
+        #[arg(long)]
+        compression_level: Option<i32>,
     },
     Patch {
         old: PathBuf,
@@ -45,6 +47,7 @@ fn main() -> anyhow::Result<()> {
             new,
             patch,
             compression_threads,
+            compression_level,
         } => {
             let mut old_file = File::open(&old)
                 .with_context(|| format!("Failed to open old file '{}'", old.display()))?;
@@ -78,6 +81,9 @@ fn main() -> anyhow::Result<()> {
             let mut diff_config = DiffConfig::default();
             if let Some(threads) = compression_threads {
                 diff_config.compression_threads(threads);
+            }
+            if let Some(level) = compression_level {
+                diff_config.compression_level(level);
             }
 
             ina::diff_with_config(&old_data, &new_data, &mut patch_file, &diff_config)
