@@ -17,7 +17,7 @@ use crate::{
 ///
 /// We set this to 1 to ensure I/O and compression can run concurrently.
 const DEFAULT_COMPRESSION_THREADS: u32 = 1;
-const ZSTD_COMPRESSION_LEVEL: i32 = 19;
+const DEFAULT_COMPRESSION_LEVEL: i32 = 19;
 
 /// Constructs a patch between two blobs with default options
 ///
@@ -109,7 +109,7 @@ where
     patch.write_u32::<LittleEndian>(VERSION)?;
 
     // Create a compressor for the inner patch data
-    let mut patch_encoder = Encoder::new(patch, ZSTD_COMPRESSION_LEVEL)?;
+    let mut patch_encoder = Encoder::new(patch, options.compression_level)?;
     patch_encoder.multithread(options.compression_threads)?;
 
     // Iterate over bsdiff control values, writing them to the patch stream
@@ -139,6 +139,7 @@ where
 #[derive(Clone, Copy, Debug, Eq, Hash, PartialEq, PartialOrd, Ord)]
 pub struct DiffConfig {
     compression_threads: u32,
+    compression_level: i32,
 }
 
 impl DiffConfig {
@@ -148,6 +149,7 @@ impl DiffConfig {
     pub const fn new() -> Self {
         Self {
             compression_threads: DEFAULT_COMPRESSION_THREADS,
+            compression_level: DEFAULT_COMPRESSION_LEVEL,
         }
     }
 
@@ -162,6 +164,19 @@ impl DiffConfig {
     /// speed but slightly lowering memory usage.
     pub fn compression_threads(&mut self, threads: u32) -> &mut Self {
         self.compression_threads = threads;
+        self
+    }
+
+    /// Sets the compression level to use for compressing the patch file.
+    ///
+    /// The compression level can be set to any value between -7 and 22 inclusive. The most
+    /// positive number results in the highest compression ratio at the cost of speed, while the
+    /// least positive number results in the highest speed at the cost of compression ratio. Any
+    /// value outside of this range will be clamped to fit inside the range.
+    ///
+    /// Levels 20-22 result in significantly higher memory usage.
+    pub fn compression_level(&mut self, level: i32) -> &mut Self {
+        self.compression_level = level;
         self
     }
 }
