@@ -16,7 +16,7 @@ use crate::{
 /// The default number of compression threads to create
 ///
 /// We set this to 1 to ensure I/O and compression can run concurrently.
-const DEFAULT_COMPRESS_THREADS: u32 = 1;
+const DEFAULT_COMPRESSION_THREADS: u32 = 1;
 const ZSTD_COMPRESSION_LEVEL: i32 = 19;
 
 /// Constructs a patch between two blobs with default options
@@ -90,7 +90,7 @@ where
 /// let new = b"Hero";
 /// let mut patch = Vec::new();
 ///
-/// ina::diff_with_config(old, new, &mut patch, &DiffConfig::new().compress_threads(0))?;
+/// ina::diff_with_config(old, new, &mut patch, &DiffConfig::new().compression_threads(0))?;
 ///
 /// # Ok(())
 /// # }
@@ -110,7 +110,7 @@ where
 
     // Create a compressor for the inner patch data
     let mut patch_encoder = Encoder::new(patch, ZSTD_COMPRESSION_LEVEL)?;
-    patch_encoder.multithread(options.compress_threads)?;
+    patch_encoder.multithread(options.compression_threads)?;
 
     // Iterate over bsdiff control values, writing them to the patch stream
     for control in ControlProducer::new(old, new) {
@@ -138,7 +138,7 @@ where
 /// resource-constrained or powerful computing environments for better performance.
 #[derive(Clone, Copy, Debug, Eq, Hash, PartialEq, PartialOrd, Ord)]
 pub struct DiffConfig {
-    compress_threads: u32,
+    compression_threads: u32,
 }
 
 impl DiffConfig {
@@ -147,7 +147,7 @@ impl DiffConfig {
     /// This configuration can be reused across diff operations.
     pub const fn new() -> Self {
         Self {
-            compress_threads: DEFAULT_COMPRESS_THREADS,
+            compression_threads: DEFAULT_COMPRESSION_THREADS,
         }
     }
 
@@ -160,8 +160,8 @@ impl DiffConfig {
     ///
     /// A value of 0 means that compression will run on the same thread as I/O, reducing diffing
     /// speed but slightly lowering memory usage.
-    pub fn compress_threads(&mut self, threads: u32) -> &mut Self {
-        self.compress_threads = threads;
+    pub fn compression_threads(&mut self, threads: u32) -> &mut Self {
+        self.compression_threads = threads;
         self
     }
 }
