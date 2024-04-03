@@ -34,7 +34,7 @@ enum Command {
     Patch {
         old: PathBuf,
         patch: PathBuf,
-        out: PathBuf,
+        new: PathBuf,
     },
 }
 
@@ -89,15 +89,15 @@ fn main() -> anyhow::Result<()> {
             ina::diff_with_config(&old_data, &new_data, &mut patch_file, &diff_config)
                 .context("I/O error occurred while generating patch file")?;
         }
-        Command::Patch { old, patch, out } => {
+        Command::Patch { old, patch, new } => {
             let old_file = File::open(&old)
                 .with_context(|| format!("Failed to open old file '{}'", old.display()))?;
             let patch_file = File::open(&patch)
                 .with_context(|| format!("Failed to open patch file '{}'", patch.display()))?;
-            let mut out_file = File::create(&out)
-                .with_context(|| format!("Failed to create out file '{}'", out.display()))?;
+            let mut new_file = File::create(&new)
+                .with_context(|| format!("Failed to create new file '{}'", new.display()))?;
 
-            ina::patch(old_file, patch_file, &mut out_file)
+            ina::patch(old_file, patch_file, &mut new_file)
                 .context("Failed to apply patch file")?;
         }
     }
