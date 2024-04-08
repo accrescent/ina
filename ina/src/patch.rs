@@ -6,7 +6,7 @@ use std::{
     cmp,
     error::Error,
     fmt::{self, Display, Formatter},
-    io::{self, BufReader, ErrorKind, Read, Seek, SeekFrom, Write},
+    io::{self, BufRead, BufReader, ErrorKind, Read, Seek, SeekFrom, Write},
 };
 
 use byteorder::{LittleEndian, ReadBytesExt};
@@ -19,13 +19,13 @@ use crate::header::{MAGIC, VERSION};
 ///
 /// Because this struct implements [`Read`], it can be used to apply a patch in a streaming
 /// fashion, e.g., while reading the patch from the network.
-pub struct Patcher<'a, O, P>
+pub struct Patcher<'a, O, B>
 where
     O: Read + Seek,
-    P: Read,
+    B: BufRead,
 {
     old: O,
-    patch: Decoder<'a, BufReader<P>>,
+    patch: Decoder<'a, B>,
     state: PatcherState,
 }
 
@@ -96,12 +96,18 @@ impl From<io::Error> for PatchError {
     }
 }
 
-impl<'a, O, P> Patcher<'a, O, P>
+impl<'a, O, P> Patcher<'a, O, BufReader<P>>
 where
     O: Read + Seek,
     P: Read,
 {
     /// Creates a new `Patcher` for `old` and `patch`.
+    ///
+    /// Each `Patcher` uses an internal read buffer for decompression. When using this method to
+    /// create a `Patcher`, the size of this buffer is optimized for the decompression algorithm
+    /// used, so it's highly recommended to use this method for creating a `Patcher` in most
+    /// circumstances. If you need to supply your own buffer, use [`Patcher::with_buffer()`]
+    /// instead.
     ///
     /// # Errors
     ///
@@ -123,15 +129,7 @@ where
     /// # }
     /// ```
     pub fn new(old: O, mut patch: P) -> Result<Self, PatchError> {
-        let magic = patch.read_u32::<LittleEndian>()?;
-        if magic != MAGIC {
-            return Err(PatchError::BadMagic(magic));
-        }
-
-        let version = patch.read_u32::<LittleEndian>()?;
-        if version != VERSION {
-            return Err(PatchError::UnsupportedVersion(version));
-        }
+        read_header(&mut patch)?;
 
         let patch_decoder = Decoder::new(patch)?;
 
@@ -143,10 +141,75 @@ where
     }
 }
 
-impl<'a, O, P> Read for Patcher<'a, O, P>
+impl<'a, O, B> Patcher<'a, O, B>
 where
     O: Read + Seek,
+    B: BufRead,
+{
+    /// Creates a new `Patcher` for `old` and `patch` using a pre-existing buffer.
+    ///
+    /// Each `Patcher` uses an internal read buffer for decompression. [`Patcher::new()`] optimizes
+    /// the size of this read buffer for the decompression algorithm used, so it's highly
+    /// recommended to use that method to create a `Patcher` instead of this one when possible.
+    /// However, this method may be useful if you need to set a hard limit on `Patcher` memory
+    /// usage or make allocations upfront for sandboxing purposes.
+    ///
+    /// # Errors
+    ///
+    /// Returns an error if an I/O error occurs while reading the patch metadata or if the patch
+    /// metadata is invalid.
+    ///
+    /// # Examples
+    ///
+    /// ```no_run
+    /// use std::{fs::File, io::BufReader};
+    /// use ina::Patcher;
+    ///
+    /// # fn main() -> Result<(), Box<dyn std::error::Error>> {
+    /// // Ensure our Patcher never uses more than 4 MiB of memory
+    /// const BUF_SIZE: usize = 1 << 22;
+    ///
+    /// let old = File::open("app-v1.exe")?;
+    /// let patch = File::open("app-v1-to-v2.ina")?;
+    ///
+    /// let patcher = Patcher::with_buffer(old, BufReader::with_capacity(BUF_SIZE, patch))?;
+    /// # Ok(())
+    /// # }
+    /// ```
+    pub fn with_buffer(old: O, mut patch: B) -> Result<Self, PatchError> {
+        read_header(&mut patch)?;
+
+        let patch_decoder = Decoder::with_buffer(patch)?;
+
+        Ok(Self {
+            old,
+            patch: patch_decoder,
+            state: PatcherState::AtNextControl,
+        })
+    }
+}
+
+fn read_header<P>(patch: &mut P) -> Result<(), PatchError>
+where
     P: Read,
+{
+    let magic = patch.read_u32::<LittleEndian>()?;
+    if magic != MAGIC {
+        return Err(PatchError::BadMagic(magic));
+    }
+
+    let version = patch.read_u32::<LittleEndian>()?;
+    if version != VERSION {
+        return Err(PatchError::UnsupportedVersion(version));
+    }
+
+    Ok(())
+}
+
+impl<'a, O, B> Read for Patcher<'a, O, B>
+where
+    O: Read + Seek,
+    B: BufRead,
 {
     fn read(&mut self, mut buf: &mut [u8]) -> io::Result<usize> {
         let mut read_total = 0;
