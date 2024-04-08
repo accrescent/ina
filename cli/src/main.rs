@@ -4,13 +4,13 @@
 
 use std::{
     fs::{self, File},
-    io::Read,
+    io::{self, BufReader, Read},
     path::PathBuf,
 };
 
 use anyhow::Context;
 use clap::{Parser, Subcommand};
-use ina::DiffConfig;
+use ina::{DiffConfig, Patcher};
 
 /// Binary diffing and patching designed for executables
 #[derive(Parser)]
@@ -64,6 +64,16 @@ enum Command {
         patch: PathBuf,
         /// The path of the output new file
         new: PathBuf,
+        /// The size in bytes of the buffer to use for decompression
+        ///
+        /// By default, the patching process creates an internal read buffer whose size is
+        /// optimized for the decompression algorithm in use. Because it is optimized, it is
+        /// recommended to leave it at its default size unless there is a specific reason to change
+        /// it. Low values may reduce memory usage at a cost of patching speed.
+        ///
+        /// Default: varies
+        #[arg(long, verbatim_doc_comment)]
+        decompression_buffer_size: Option<usize>,
     },
 }
 
@@ -118,7 +128,12 @@ fn main() -> anyhow::Result<()> {
             ina::diff_with_config(&old_data, &new_data, &mut patch_file, &diff_config)
                 .context("I/O error occurred while generating patch file")?;
         }
-        Command::Patch { old, patch, new } => {
+        Command::Patch {
+            old,
+            patch,
+            new,
+            decompression_buffer_size,
+        } => {
             let old_file = File::open(&old)
                 .with_context(|| format!("Failed to open old file '{}'", old.display()))?;
             let patch_file = File::open(&patch)
@@ -126,8 +141,13 @@ fn main() -> anyhow::Result<()> {
             let mut new_file = File::create(&new)
                 .with_context(|| format!("Failed to create new file '{}'", new.display()))?;
 
-            ina::patch(old_file, patch_file, &mut new_file)
-                .context("Failed to apply patch file")?;
+            let mut patcher = match decompression_buffer_size {
+                Some(size) => {
+                    Patcher::with_buffer(old_file, BufReader::with_capacity(size, patch_file))?
+                }
+                None => Patcher::new(old_file, patch_file)?,
+            };
+            io::copy(&mut patcher, &mut new_file).context("Failed to apply patch file")?;
         }
     }
 
