@@ -15,6 +15,8 @@ use zstd::Decoder;
 
 use crate::header::{MAGIC, VERSION};
 
+const DEFAULT_BUF_SIZE: usize = 8192;
+
 /// A patcher that reconstructs a new blob from an old blob and a patch
 ///
 /// Because this struct implements [`Read`], it can be used to apply a patch in a streaming
@@ -27,6 +29,7 @@ where
     old: O,
     patch: Decoder<'a, B>,
     state: PatcherState,
+    buf: Vec<u8>,
 }
 
 enum PatcherState {
@@ -137,6 +140,7 @@ where
             old,
             patch: patch_decoder,
             state: PatcherState::AtNextControl,
+            buf: vec![0; DEFAULT_BUF_SIZE],
         })
     }
 }
@@ -185,6 +189,7 @@ where
             old,
             patch: patch_decoder,
             state: PatcherState::AtNextControl,
+            buf: vec![0; DEFAULT_BUF_SIZE],
         })
     }
 }
@@ -235,13 +240,15 @@ where
                     //
                     // Because `buf` may not be large enough to hold everything we need to read, we
                     // keep track of how many bytes we wrote and jump back to this state if needed.
-                    let max_read_len = cmp::min(add_len, buf.len());
+                    let max_read_len = cmp::min(cmp::min(add_len, buf.len()), self.buf.len());
 
                     let out = &mut buf[..max_read_len];
                     self.old.read_exact(out)?;
 
-                    let mut diff = vec![0; max_read_len];
-                    self.patch.read_exact(&mut diff)?;
+                    // Reuse `self.buf` to hold the difference bytes read from the patch file
+                    // without allocating on every `read()`
+                    let diff = &mut self.buf[..max_read_len];
+                    self.patch.read_exact(diff)?;
 
                     (0..max_read_len).for_each(|i| out[i] = out[i].wrapping_add(diff[i]));
 
