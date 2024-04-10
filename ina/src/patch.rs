@@ -298,7 +298,7 @@ struct PatchVersion {
 }
 
 impl PatchVersion {
-    pub fn from_values(major: u16, minor: u16) -> Result<Self, TryFromValueError> {
+    fn from_values(major: u16, minor: u16) -> Result<Self, TryFromValueError> {
         let major = major.try_into()?;
 
         Ok(Self { major, minor })
