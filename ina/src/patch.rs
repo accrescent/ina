@@ -294,6 +294,7 @@ impl From<TryFromValueError> for PatchError {
 ///
 /// This struct represents information about a patch file present in its header such the patch
 /// format version.
+#[derive(Clone, Copy, Debug, Eq, Hash, PartialEq, PartialOrd, Ord)]
 pub struct PatchMetadata {
     version: PatchVersion,
 }
