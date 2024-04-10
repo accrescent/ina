@@ -385,9 +385,9 @@ impl Error for TryFromValueError {
 ///
 /// Returns an error if an I/O error occurs while reading the patch metadata or if the patch
 /// metadata is invalid.
-pub fn read_header<P>(patch: &mut P) -> Result<PatchMetadata, PatchError>
+pub fn read_header<P>(mut patch: &mut P) -> Result<PatchMetadata, PatchError>
 where
-    P: Read,
+    P: Read + ?Sized,
 {
     let magic = patch.read_u32::<LittleEndian>()?;
     if magic != MAGIC {
