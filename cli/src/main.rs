@@ -75,6 +75,11 @@ enum Command {
         #[arg(long, verbatim_doc_comment)]
         decompression_buffer_size: Option<usize>,
     },
+    /// Display patch metadata
+    Info {
+        /// The path of the patch file
+        patch: PathBuf,
+    },
 }
 
 fn main() -> anyhow::Result<()> {
@@ -148,6 +153,20 @@ fn main() -> anyhow::Result<()> {
                 None => Patcher::new(old_file, patch_file)?,
             };
             io::copy(&mut patcher, &mut new_file).context("Failed to apply patch file")?;
+        }
+        Command::Info { patch } => {
+            let mut patch_file = File::open(&patch)
+                .with_context(|| format!("Failed to open patch file '{}'", patch.display()))?;
+
+            let patch_format_version = ina::read_header(&mut patch_file)
+                .with_context(|| format!("Failed to read patch header of '{}'", patch.display()))?
+                .version();
+
+            println!(
+                "Ina patch file, format version {}.{}",
+                patch_format_version.major(),
+                patch_format_version.minor(),
+            );
         }
     }
 
