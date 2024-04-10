@@ -10,7 +10,7 @@ use zstd::Encoder;
 
 use crate::{
     bsdiff::ControlProducer,
-    header::{MAGIC, VERSION},
+    header::{DATA_OFFSET, MAGIC, VERSION_MAJOR, VERSION_MINOR},
 };
 
 /// Constructs a patch between two blobs with default options
@@ -92,7 +92,7 @@ where
 pub fn diff_with_config<W>(
     old: &[u8],
     new: &[u8],
-    patch: &mut W,
+    mut patch: &mut W,
     options: &DiffConfig,
 ) -> io::Result<()>
 where
@@ -100,7 +100,9 @@ where
 {
     // Write the header
     patch.write_u32::<LittleEndian>(MAGIC)?;
-    patch.write_u32::<LittleEndian>(VERSION)?;
+    patch.write_u16::<LittleEndian>(VERSION_MAJOR)?;
+    patch.write_u16::<LittleEndian>(VERSION_MINOR)?;
+    patch.write_varint(DATA_OFFSET)?;
 
     // Create a compressor for the inner patch data
     let mut patch_encoder = Encoder::new(patch, options.compression_level)?;

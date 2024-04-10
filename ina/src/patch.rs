@@ -13,7 +13,7 @@ use byteorder::{LittleEndian, ReadBytesExt};
 use integer_encoding::VarIntReader;
 use zstd::Decoder;
 
-use crate::header::{MAGIC, VERSION};
+use crate::header::{MAGIC, VERSION_MAJOR};
 
 const DEFAULT_BUF_SIZE: usize = 8192;
 
@@ -63,8 +63,8 @@ pub enum PatchError {
     Io(io::Error),
     /// The patch magic is invalid
     BadMagic(u32),
-    /// The patch version is unsupported
-    UnsupportedVersion(u32),
+    /// The patch major version is unsupported
+    UnsupportedVersion(u16),
 }
 
 impl Display for PatchError {
@@ -77,7 +77,8 @@ impl Display for PatchError {
             PatchError::UnsupportedVersion(version) => {
                 write!(
                     f,
-                    "unsupported version: found {version}, supported versions are [{VERSION}]",
+                    "unsupported version: found version {version}.x, \
+                    supported versions are {VERSION_MAJOR}.x",
                 )
             }
         }
@@ -96,6 +97,12 @@ impl Error for PatchError {
 impl From<io::Error> for PatchError {
     fn from(value: io::Error) -> Self {
         PatchError::Io(value)
+    }
+}
+
+impl From<TryFromValueError> for PatchError {
+    fn from(value: TryFromValueError) -> Self {
+        PatchError::UnsupportedVersion(value.0)
     }
 }
 
@@ -194,7 +201,52 @@ where
     }
 }
 
-fn read_header<P>(patch: &mut P) -> Result<(), PatchError>
+struct PatchVersion {
+    #[allow(dead_code)]
+    major: MajorVersion,
+    #[allow(dead_code)]
+    minor: u16,
+}
+
+impl PatchVersion {
+    pub fn from_values(major: u16, minor: u16) -> Result<Self, TryFromValueError> {
+        let major = major.try_into()?;
+
+        Ok(Self { major, minor })
+    }
+}
+
+enum MajorVersion {
+    One,
+}
+
+impl TryFrom<u16> for MajorVersion {
+    type Error = TryFromValueError;
+
+    fn try_from(value: u16) -> Result<Self, Self::Error> {
+        match value {
+            1 => Ok(MajorVersion::One),
+            _ => Err(TryFromValueError(value)),
+        }
+    }
+}
+
+#[derive(Debug)]
+struct TryFromValueError(u16);
+
+impl Display for TryFromValueError {
+    fn fmt(&self, f: &mut Formatter) -> fmt::Result {
+        write!(f, "version out of supported range")
+    }
+}
+
+impl Error for TryFromValueError {
+    fn source(&self) -> Option<&(dyn Error + 'static)> {
+        None
+    }
+}
+
+fn read_header<P>(patch: &mut P) -> Result<PatchVersion, PatchError>
 where
     P: Read,
 {
@@ -203,12 +255,16 @@ where
         return Err(PatchError::BadMagic(magic));
     }
 
-    let version = patch.read_u32::<LittleEndian>()?;
-    if version != VERSION {
-        return Err(PatchError::UnsupportedVersion(version));
-    }
+    let version_major = patch.read_u16::<LittleEndian>()?;
+    let version_minor = patch.read_u16::<LittleEndian>()?;
+    let patch_version = PatchVersion::from_values(version_major, version_minor)?;
 
-    Ok(())
+    let data_offset = patch.read_varint()?;
+
+    // Discard the portion of the patch we don't understand
+    io::copy(&mut patch.take(data_offset), &mut io::sink())?;
+
+    Ok(patch_version)
 }
 
 impl<'a, O, B> Read for Patcher<'a, O, B>
