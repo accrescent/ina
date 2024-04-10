@@ -30,6 +30,7 @@ where
     patch: Decoder<'a, B>,
     state: PatcherState,
     buf: Vec<u8>,
+    metadata: PatchMetadata,
 }
 
 enum PatcherState {
@@ -74,7 +75,7 @@ where
     /// # }
     /// ```
     pub fn with_buffer(old: O, mut patch: B) -> Result<Self, PatchError> {
-        read_header(&mut patch)?;
+        let metadata = read_header(&mut patch)?;
 
         let patch_decoder = Decoder::with_buffer(patch)?;
 
@@ -83,7 +84,20 @@ where
             patch: patch_decoder,
             state: PatcherState::AtNextControl,
             buf: vec![0; DEFAULT_BUF_SIZE],
+            metadata,
         })
+    }
+
+    /// Returns the metadata of the patch file associated with this `Patcher`
+    ///
+    /// This method gets the patch metadata for a file whose metadata has already been parsed by a
+    /// `Patcher`, preventing the need to seek backward and re-read the header in the event that
+    /// both the patch metadata and `Patcher` are needed.
+    ///
+    /// If you only need the patch metadata, prefer using [`read_header()`] to avoid the overhead
+    /// of creating a `Patcher`.
+    pub fn metadata(&self) -> &PatchMetadata {
+        &self.metadata
     }
 }
 
@@ -120,7 +134,7 @@ where
     /// # }
     /// ```
     pub fn new(old: O, mut patch: P) -> Result<Self, PatchError> {
-        read_header(&mut patch)?;
+        let metadata = read_header(&mut patch)?;
 
         let patch_decoder = Decoder::new(patch)?;
 
@@ -129,6 +143,7 @@ where
             patch: patch_decoder,
             state: PatcherState::AtNextControl,
             buf: vec![0; DEFAULT_BUF_SIZE],
+            metadata,
         })
     }
 }
