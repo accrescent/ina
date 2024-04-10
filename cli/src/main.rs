@@ -60,7 +60,7 @@ enum Command {
     Patch {
         /// The path of the old file
         old: PathBuf,
-        /// The patch of the patch file
+        /// The path of the patch file
         patch: PathBuf,
         /// The path of the output new file
         new: PathBuf,
