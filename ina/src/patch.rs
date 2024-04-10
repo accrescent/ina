@@ -157,8 +157,9 @@ where
                     }
                 }
                 PatcherState::Add(add_len) => {
-                    // We're currently reading an add field, so read `len` bytes from both the old file
-                    // and the patch file, add them together, and write the result to the buffer.
+                    // We're currently reading an add field, so read `len` bytes from both the old
+                    // file and the patch file, add them together, and write the result to the
+                    // buffer.
                     //
                     // Because `buf` may not be large enough to hold everything we need to read, we
                     // keep track of how many bytes we wrote and jump back to this state if needed.
