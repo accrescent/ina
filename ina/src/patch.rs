@@ -290,10 +290,31 @@ impl From<TryFromValueError> for PatchError {
     }
 }
 
-struct PatchVersion {
-    #[allow(dead_code)]
+/// Metadata of a patch file.
+///
+/// This struct represents information about a patch file present in its header such the patch
+/// format version.
+pub struct PatchMetadata {
+    version: PatchVersion,
+}
+
+impl PatchMetadata {
+    fn new(version: PatchVersion) -> Self {
+        Self { version }
+    }
+
+    /// Returns the version of the patch file format.
+    pub fn version(&self) -> PatchVersion {
+        self.version
+    }
+}
+
+/// Version of a patch file format.
+///
+/// This structure represents an acceptable patch format version which we know how to parse.
+#[derive(Clone, Copy, Debug, Eq, Hash, PartialEq, PartialOrd, Ord)]
+pub struct PatchVersion {
     major: MajorVersion,
-    #[allow(dead_code)]
     minor: u16,
 }
 
@@ -303,8 +324,19 @@ impl PatchVersion {
 
         Ok(Self { major, minor })
     }
+
+    /// Returns the major version of the patch format
+    pub fn major(&self) -> u16 {
+        self.major.into()
+    }
+
+    /// Returns the minor version of the patch format
+    pub fn minor(&self) -> u16 {
+        self.minor
+    }
 }
 
+#[derive(Clone, Copy, Debug, Eq, Hash, PartialEq, PartialOrd, Ord)]
 enum MajorVersion {
     One,
 }
@@ -316,6 +348,14 @@ impl TryFrom<u16> for MajorVersion {
         match value {
             1 => Ok(MajorVersion::One),
             _ => Err(TryFromValueError(value)),
+        }
+    }
+}
+
+impl From<MajorVersion> for u16 {
+    fn from(value: MajorVersion) -> Self {
+        match value {
+            MajorVersion::One => 1,
         }
     }
 }
@@ -335,7 +375,17 @@ impl Error for TryFromValueError {
     }
 }
 
-fn read_header<P>(patch: &mut P) -> Result<PatchVersion, PatchError>
+/// Reads the header of `patch` to extract its metadata.
+///
+/// This function reads the full header of `patch`, including fields the current parser doesn't
+/// understand. This behavior means that the `patch` reader will always point to the beginning of
+/// the patch data section after successful completion of this function.
+///
+/// # Errors
+///
+/// Returns an error if an I/O error occurs while reading the patch metadata or if the patch
+/// metadata is invalid.
+pub fn read_header<P>(patch: &mut P) -> Result<PatchMetadata, PatchError>
 where
     P: Read,
 {
@@ -353,7 +403,7 @@ where
     // Discard the portion of the patch we don't understand
     io::copy(&mut patch.take(data_offset), &mut io::sink())?;
 
-    Ok(patch_version)
+    Ok(PatchMetadata::new(patch_version))
 }
 
 /// Reconstructs a new blob from an old blob and a patch

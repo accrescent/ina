@@ -60,4 +60,4 @@ pub mod sandbox;
 #[cfg(feature = "diff")]
 pub use diff::{diff, diff_with_config, DiffConfig};
 #[cfg(feature = "patch")]
-pub use patch::{patch, PatchError, Patcher};
+pub use patch::{patch, read_header, PatchError, PatchMetadata, PatchVersion, Patcher};
