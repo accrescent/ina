@@ -38,120 +38,6 @@ enum PatcherState {
     Copy(usize),
 }
 
-/// An error indicating that patching a blob failed.
-///
-/// This error is returned by [`Patcher::new()`] when the patch given to it contains invalid
-/// metadata or reading the metadata fails. For more information, see that function's
-/// documentation.
-///
-/// # Examples
-///
-/// ```
-/// use std::io::Cursor;
-/// use ina::{PatchError, Patcher};
-///
-/// let mut old = Cursor::new(&[1, 2, 3, 4]);
-/// // Garbage data
-/// let patch = &[0, 0, 0, 0];
-/// let patcher = Patcher::new(old, patch.as_ref());
-///
-/// assert!(matches!(patcher, Err(PatchError::BadMagic(_))));
-/// ```
-#[derive(Debug)]
-pub enum PatchError {
-    /// An I/O error occurred
-    Io(io::Error),
-    /// The patch magic is invalid
-    BadMagic(u32),
-    /// The patch major version is unsupported
-    UnsupportedVersion(u16),
-}
-
-impl Display for PatchError {
-    fn fmt(&self, f: &mut Formatter) -> fmt::Result {
-        match self {
-            PatchError::Io(e) => write!(f, "I/O error: {e}"),
-            PatchError::BadMagic(magic) => {
-                write!(f, "bad magic: expected {MAGIC:x}, found {magic:x}")
-            }
-            PatchError::UnsupportedVersion(version) => {
-                write!(
-                    f,
-                    "unsupported version: found version {version}.x, \
-                    supported versions are {VERSION_MAJOR}.x",
-                )
-            }
-        }
-    }
-}
-
-impl Error for PatchError {
-    fn source(&self) -> Option<&(dyn Error + 'static)> {
-        match self {
-            PatchError::Io(e) => e.source(),
-            _ => None,
-        }
-    }
-}
-
-impl From<io::Error> for PatchError {
-    fn from(value: io::Error) -> Self {
-        PatchError::Io(value)
-    }
-}
-
-impl From<TryFromValueError> for PatchError {
-    fn from(value: TryFromValueError) -> Self {
-        PatchError::UnsupportedVersion(value.0)
-    }
-}
-
-impl<'a, O, P> Patcher<'a, O, BufReader<P>>
-where
-    O: Read + Seek,
-    P: Read,
-{
-    /// Creates a new `Patcher` for `old` and `patch`.
-    ///
-    /// Each `Patcher` uses an internal read buffer for decompression. When using this method to
-    /// create a `Patcher`, the size of this buffer is optimized for the decompression algorithm
-    /// used, so it's highly recommended to use this method for creating a `Patcher` in most
-    /// circumstances. If you need to supply your own buffer, use [`Patcher::with_buffer()`]
-    /// instead.
-    ///
-    /// # Errors
-    ///
-    /// Returns an error if an I/O error occurs while reading the patch metadata or if the patch
-    /// metadata is invalid.
-    ///
-    /// # Examples
-    ///
-    /// ```no_run
-    /// use std::fs::File;
-    /// use ina::Patcher;
-    ///
-    /// # fn main() -> Result<(), Box<dyn std::error::Error>> {
-    /// let old = File::open("app-v1.exe")?;
-    /// let patch = File::open("app-v1-to-v2.ina")?;
-    ///
-    /// let patcher = Patcher::new(old, patch)?;
-    /// # Ok(())
-    /// # }
-    /// ```
-    pub fn new(old: O, mut patch: P) -> Result<Self, PatchError> {
-        read_header(&mut patch)?;
-
-        let patch_decoder = Decoder::new(patch)?;
-
-        Ok(Self {
-            old,
-            patch: patch_decoder,
-            state: PatcherState::AtNextControl,
-            buf: vec![0; DEFAULT_BUF_SIZE],
-        })
-    }
-}
-
 impl<'a, O, B> Patcher<'a, O, B>
 where
     O: Read + Seek,
@@ -201,70 +87,50 @@ where
     }
 }
 
-struct PatchVersion {
-    #[allow(dead_code)]
-    major: MajorVersion,
-    #[allow(dead_code)]
-    minor: u16,
-}
-
-impl PatchVersion {
-    pub fn from_values(major: u16, minor: u16) -> Result<Self, TryFromValueError> {
-        let major = major.try_into()?;
-
-        Ok(Self { major, minor })
-    }
-}
-
-enum MajorVersion {
-    One,
-}
-
-impl TryFrom<u16> for MajorVersion {
-    type Error = TryFromValueError;
-
-    fn try_from(value: u16) -> Result<Self, Self::Error> {
-        match value {
-            1 => Ok(MajorVersion::One),
-            _ => Err(TryFromValueError(value)),
-        }
-    }
-}
-
-#[derive(Debug)]
-struct TryFromValueError(u16);
-
-impl Display for TryFromValueError {
-    fn fmt(&self, f: &mut Formatter) -> fmt::Result {
-        write!(f, "version out of supported range")
-    }
-}
-
-impl Error for TryFromValueError {
-    fn source(&self) -> Option<&(dyn Error + 'static)> {
-        None
-    }
-}
-
-fn read_header<P>(patch: &mut P) -> Result<PatchVersion, PatchError>
+impl<'a, O, P> Patcher<'a, O, BufReader<P>>
 where
+    O: Read + Seek,
     P: Read,
 {
-    let magic = patch.read_u32::<LittleEndian>()?;
-    if magic != MAGIC {
-        return Err(PatchError::BadMagic(magic));
+    /// Creates a new `Patcher` for `old` and `patch`.
+    ///
+    /// Each `Patcher` uses an internal read buffer for decompression. When using this method to
+    /// create a `Patcher`, the size of this buffer is optimized for the decompression algorithm
+    /// used, so it's highly recommended to use this method for creating a `Patcher` in most
+    /// circumstances. If you need to supply your own buffer, use [`Patcher::with_buffer()`]
+    /// instead.
+    ///
+    /// # Errors
+    ///
+    /// Returns an error if an I/O error occurs while reading the patch metadata or if the patch
+    /// metadata is invalid.
+    ///
+    /// # Examples
+    ///
+    /// ```no_run
+    /// use std::fs::File;
+    /// use ina::Patcher;
+    ///
+    /// # fn main() -> Result<(), Box<dyn std::error::Error>> {
+    /// let old = File::open("app-v1.exe")?;
+    /// let patch = File::open("app-v1-to-v2.ina")?;
+    ///
+    /// let patcher = Patcher::new(old, patch)?;
+    /// # Ok(())
+    /// # }
+    /// ```
+    pub fn new(old: O, mut patch: P) -> Result<Self, PatchError> {
+        read_header(&mut patch)?;
+
+        let patch_decoder = Decoder::new(patch)?;
+
+        Ok(Self {
+            old,
+            patch: patch_decoder,
+            state: PatcherState::AtNextControl,
+            buf: vec![0; DEFAULT_BUF_SIZE],
+        })
     }
-
-    let version_major = patch.read_u16::<LittleEndian>()?;
-    let version_minor = patch.read_u16::<LittleEndian>()?;
-    let patch_version = PatchVersion::from_values(version_major, version_minor)?;
-
-    let data_offset = patch.read_varint()?;
-
-    // Discard the portion of the patch we don't understand
-    io::copy(&mut patch.take(data_offset), &mut io::sink())?;
-
-    Ok(patch_version)
 }
 
 impl<'a, O, B> Read for Patcher<'a, O, B>
@@ -353,6 +219,140 @@ where
 
         Ok(read_total)
     }
+}
+
+/// An error indicating that patching a blob failed.
+///
+/// This error is returned by [`Patcher::new()`] when the patch given to it contains invalid
+/// metadata or reading the metadata fails. For more information, see that function's
+/// documentation.
+///
+/// # Examples
+///
+/// ```
+/// use std::io::Cursor;
+/// use ina::{PatchError, Patcher};
+///
+/// let mut old = Cursor::new(&[1, 2, 3, 4]);
+/// // Garbage data
+/// let patch = &[0, 0, 0, 0];
+/// let patcher = Patcher::new(old, patch.as_ref());
+///
+/// assert!(matches!(patcher, Err(PatchError::BadMagic(_))));
+/// ```
+#[derive(Debug)]
+pub enum PatchError {
+    /// An I/O error occurred
+    Io(io::Error),
+    /// The patch magic is invalid
+    BadMagic(u32),
+    /// The patch major version is unsupported
+    UnsupportedVersion(u16),
+}
+
+impl Display for PatchError {
+    fn fmt(&self, f: &mut Formatter) -> fmt::Result {
+        match self {
+            PatchError::Io(e) => write!(f, "I/O error: {e}"),
+            PatchError::BadMagic(magic) => {
+                write!(f, "bad magic: expected {MAGIC:x}, found {magic:x}")
+            }
+            PatchError::UnsupportedVersion(version) => {
+                write!(
+                    f,
+                    "unsupported version: found version {version}.x, \
+                    supported versions are {VERSION_MAJOR}.x",
+                )
+            }
+        }
+    }
+}
+
+impl Error for PatchError {
+    fn source(&self) -> Option<&(dyn Error + 'static)> {
+        match self {
+            PatchError::Io(e) => e.source(),
+            _ => None,
+        }
+    }
+}
+
+impl From<io::Error> for PatchError {
+    fn from(value: io::Error) -> Self {
+        PatchError::Io(value)
+    }
+}
+
+impl From<TryFromValueError> for PatchError {
+    fn from(value: TryFromValueError) -> Self {
+        PatchError::UnsupportedVersion(value.0)
+    }
+}
+
+struct PatchVersion {
+    #[allow(dead_code)]
+    major: MajorVersion,
+    #[allow(dead_code)]
+    minor: u16,
+}
+
+impl PatchVersion {
+    pub fn from_values(major: u16, minor: u16) -> Result<Self, TryFromValueError> {
+        let major = major.try_into()?;
+
+        Ok(Self { major, minor })
+    }
+}
+
+enum MajorVersion {
+    One,
+}
+
+impl TryFrom<u16> for MajorVersion {
+    type Error = TryFromValueError;
+
+    fn try_from(value: u16) -> Result<Self, Self::Error> {
+        match value {
+            1 => Ok(MajorVersion::One),
+            _ => Err(TryFromValueError(value)),
+        }
+    }
+}
+
+#[derive(Debug)]
+struct TryFromValueError(u16);
+
+impl Display for TryFromValueError {
+    fn fmt(&self, f: &mut Formatter) -> fmt::Result {
+        write!(f, "version out of supported range")
+    }
+}
+
+impl Error for TryFromValueError {
+    fn source(&self) -> Option<&(dyn Error + 'static)> {
+        None
+    }
+}
+
+fn read_header<P>(patch: &mut P) -> Result<PatchVersion, PatchError>
+where
+    P: Read,
+{
+    let magic = patch.read_u32::<LittleEndian>()?;
+    if magic != MAGIC {
+        return Err(PatchError::BadMagic(magic));
+    }
+
+    let version_major = patch.read_u16::<LittleEndian>()?;
+    let version_minor = patch.read_u16::<LittleEndian>()?;
+    let patch_version = PatchVersion::from_values(version_major, version_minor)?;
+
+    let data_offset = patch.read_varint()?;
+
+    // Discard the portion of the patch we don't understand
+    io::copy(&mut patch.take(data_offset), &mut io::sink())?;
+
+    Ok(patch_version)
 }
 
 /// Reconstructs a new blob from an old blob and a patch
