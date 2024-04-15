@@ -133,7 +133,7 @@ impl<'a> SuffixArray<'a> {
                 // sorted suffixes to the left and right of our position to determine which one
                 // contains the longest match.
                 //
-                // The presence of the sentinal guarantees 1 <= `sorted_pos` <= data.len(), so the
+                // The presence of the sentinel guarantees 1 <= `sorted_pos` <= data.len(), so the
                 // following subtractions should never underflow.
                 let left_lcp_len = len!(self.inner[sorted_pos - 1]);
                 let right_lcp_len = self.inner.get(sorted_pos).map_or(0, |p| len!(*p));
