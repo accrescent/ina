@@ -66,7 +66,6 @@ fn enable_platform_sandbox() -> seccompiler::Result<bool> {
             (libc::SYS_close, vec![]),
             (libc::SYS_epoll_pwait, vec![]),
             (libc::SYS_fcntl, vec![]),
-            (libc::SYS_getsockopt, vec![]),
             (libc::SYS_getuid, vec![]),
             (libc::SYS_ioctl, vec![]),
             (SYS_LSEEK, vec![]),
