@@ -21,7 +21,7 @@ android {
     compileSdk = 34
 
     buildToolsVersion = "34.0.0"
-    ndkVersion = "26.2.11394342"
+    ndkVersion = "26.3.11579264"
 
     defaultConfig {
         minSdk = inaMinSdk
