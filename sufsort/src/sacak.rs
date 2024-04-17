@@ -386,7 +386,7 @@ fn induce_suffix_array_s_one(suffix_array: &mut [i32], data: &[i32], suffix: boo
             // suffix_array[c] is reused as a counter
             let mut pos: i32 = c + d - 1;
             if suffix_array[pos as usize] != EMPTY as i32 {
-                // We are nunning into the left neighbor bucket. Shift-right one step the items of
+                // We are running into the left neighbor bucket. Shift-right one step the items of
                 // bucket(suffix_array, data, j).
                 let mut h: i32 = 0;
                 while h < -d {
