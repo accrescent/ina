@@ -75,7 +75,7 @@ impl<'a> Iterator for MatchMaker<'a> {
                 }
 
                 if (self.len == old_score && self.len != 0)
-                    || self.len > old_score + NON_MATCHING_BYTES_THRESHOLD
+                    || self.len >= old_score + NON_MATCHING_BYTES_THRESHOLD
                 {
                     break;
                 }
