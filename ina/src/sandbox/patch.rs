@@ -44,7 +44,10 @@ pub fn enable() -> Result<bool, SandboxError> {
     any(target_arch = "aarch64", target_arch = "x86_64")
 ))]
 fn enable_platform_sandbox() -> seccompiler::Result<bool> {
-    use seccompiler::{BpfProgram, SeccompAction, SeccompFilter};
+    use seccompiler::{
+        BpfProgram, SeccompAction, SeccompCmpArgLen, SeccompCmpOp, SeccompCondition, SeccompFilter,
+        SeccompRule,
+    };
     use std::env::consts::ARCH;
 
     // Some syscall numbers aren't yet defined in the libc crate for aarch64. Manually override
@@ -65,7 +68,15 @@ fn enable_platform_sandbox() -> seccompiler::Result<bool> {
         vec![
             (libc::SYS_close, vec![]),
             (libc::SYS_epoll_pwait, vec![]),
-            (libc::SYS_fcntl, vec![]),
+            (
+                libc::SYS_fcntl,
+                vec![SeccompRule::new(vec![SeccompCondition::new(
+                    1,
+                    SeccompCmpArgLen::Dword,
+                    SeccompCmpOp::Eq,
+                    libc::F_DUPFD_CLOEXEC as u64,
+                )?])?],
+            ),
             (libc::SYS_getuid, vec![]),
             (libc::SYS_ioctl, vec![]),
             (SYS_LSEEK, vec![]),
