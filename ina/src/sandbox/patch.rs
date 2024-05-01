@@ -80,7 +80,23 @@ fn enable_platform_sandbox() -> seccompiler::Result<bool> {
             (libc::SYS_getuid, vec![]),
             (libc::SYS_ioctl, vec![]),
             (SYS_LSEEK, vec![]),
-            (SYS_MMAP, vec![]),
+            (
+                SYS_MMAP,
+                vec![
+                    SeccompRule::new(vec![SeccompCondition::new(
+                        2,
+                        SeccompCmpArgLen::Dword,
+                        SeccompCmpOp::Eq,
+                        (libc::PROT_READ | libc::PROT_WRITE) as u64,
+                    )?])?,
+                    SeccompRule::new(vec![SeccompCondition::new(
+                        2,
+                        SeccompCmpArgLen::Dword,
+                        SeccompCmpOp::Eq,
+                        libc::PROT_NONE as u64,
+                    )?])?,
+                ],
+            ),
             (libc::SYS_munmap, vec![]),
             (libc::SYS_prctl, vec![]),
             (libc::SYS_read, vec![]),
