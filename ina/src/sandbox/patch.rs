@@ -39,7 +39,7 @@ pub fn enable() -> Result<bool, SandboxError> {
 }
 
 #[cfg(all(
-    any(target_os = "linux", target_os = "android"),
+    target_os = "android",
     target_endian = "little",
     any(target_arch = "aarch64", target_arch = "x86_64")
 ))]
@@ -102,7 +102,7 @@ fn enable_platform_sandbox() -> seccompiler::Result<bool> {
 }
 
 #[cfg(not(all(
-    any(target_os = "linux", target_os = "android"),
+    target_os = "android",
     target_endian = "little",
     any(target_arch = "aarch64", target_arch = "x86_64")
 )))]
