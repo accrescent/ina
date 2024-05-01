@@ -64,6 +64,12 @@ fn enable_platform_sandbox() -> seccompiler::Result<bool> {
     #[cfg(target_arch = "aarch64")]
     const SYS_MMAP: libc::c_long = 222;
 
+    // Expanded from
+    // https://android.googlesource.com/platform/bionic/+/fb48ddc/libc/kernel/uapi/linux/android/binder.h#124.
+    // For the sake of the expansion, we assume that BINDER_IPC_32BIT is not defined, which is
+    // always the case on 64-bit systems.
+    const BINDER_WRITE_READ: u64 = 3224396289;
+
     let filter: BpfProgram = SeccompFilter::new(
         vec![
             (libc::SYS_close, vec![]),
@@ -78,7 +84,15 @@ fn enable_platform_sandbox() -> seccompiler::Result<bool> {
                 )?])?],
             ),
             (libc::SYS_getuid, vec![]),
-            (libc::SYS_ioctl, vec![]),
+            (
+                libc::SYS_ioctl,
+                vec![SeccompRule::new(vec![SeccompCondition::new(
+                    1,
+                    SeccompCmpArgLen::Dword,
+                    SeccompCmpOp::Eq,
+                    BINDER_WRITE_READ,
+                )?])?],
+            ),
             (SYS_LSEEK, vec![]),
             (
                 SYS_MMAP,
