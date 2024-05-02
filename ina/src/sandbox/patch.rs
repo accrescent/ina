@@ -109,6 +109,13 @@ fn enable_platform_sandbox() -> seccompiler::Result<bool> {
                         SeccompCmpOp::Eq,
                         libc::PROT_NONE as u64,
                     )?])?,
+                    #[cfg(target_arch = "aarch64")]
+                    SeccompRule::new(vec![SeccompCondition::new(
+                        2,
+                        SeccompCmpArgLen::Dword,
+                        SeccompCmpOp::Eq,
+                        libc::PROT_MTE as u64,
+                    )?])?,
                 ],
             ),
             (libc::SYS_munmap, vec![]),
