@@ -50,20 +50,6 @@ fn enable_platform_sandbox() -> seccompiler::Result<bool> {
     };
     use std::env::consts::ARCH;
 
-    // Some syscall numbers aren't yet defined in the libc crate for aarch64. Manually override
-    // them here where necessary until upstream contains all the syscalls we need.
-    //
-    // The values are sourced from
-    // https://android.googlesource.com/platform/bionic/+/0339184/libc/kernel/uapi/asm-generic/unistd.h
-    #[cfg(target_arch = "x86_64")]
-    const SYS_LSEEK: libc::c_long = libc::SYS_lseek;
-    #[cfg(target_arch = "aarch64")]
-    const SYS_LSEEK: libc::c_long = 62;
-    #[cfg(target_arch = "x86_64")]
-    const SYS_MMAP: libc::c_long = libc::SYS_mmap;
-    #[cfg(target_arch = "aarch64")]
-    const SYS_MMAP: libc::c_long = 222;
-
     // Expanded from
     // https://android.googlesource.com/platform/bionic/+/fb48ddc/libc/kernel/uapi/linux/android/binder.h#124.
     // For the sake of the expansion, we assume that BINDER_IPC_32BIT is not defined, which is
@@ -93,9 +79,9 @@ fn enable_platform_sandbox() -> seccompiler::Result<bool> {
                     BINDER_WRITE_READ,
                 )?])?],
             ),
-            (SYS_LSEEK, vec![]),
+            (libc::SYS_lseek, vec![]),
             (
-                SYS_MMAP,
+                libc::SYS_mmap,
                 vec![
                     SeccompRule::new(vec![SeccompCondition::new(
                         2,
