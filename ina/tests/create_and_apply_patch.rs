@@ -2,6 +2,8 @@
 //
 // SPDX-License-Identifier: LicenseRef-Proprietary
 
+#![allow(missing_docs)]
+
 use std::{
     error::Error,
     fs::{self, File},
