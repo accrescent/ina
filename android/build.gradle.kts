@@ -18,10 +18,10 @@ val inaMinSdk = 29
 
 android {
     namespace = "app.accrescent.ina"
-    compileSdk = 34
+    compileSdk = 36
 
-    buildToolsVersion = "34.0.0"
-    ndkVersion = "26.3.11579264"
+    buildToolsVersion = "36.0.0"
+    ndkVersion = "27.2.12479018"
 
     defaultConfig {
         minSdk = inaMinSdk
