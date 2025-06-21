@@ -10,13 +10,14 @@ use std::{
 };
 
 use jni::{
+    Executor, JNIEnv,
     errors::Error as JniError,
     objects::{JClass, JObject, JValueGen},
     sys::{jint, jlong, jsize},
-    Executor, JNIEnv,
 };
 
-#[no_mangle]
+// SAFETY: There is no other global function with this name
+#[unsafe(no_mangle)]
 unsafe extern "system" fn Java_app_accrescent_ina_Patcher_patch(
     env: JNIEnv,
     _class: JClass,
@@ -142,8 +143,9 @@ impl<'a> Write for OutputStream<'a> {
     }
 }
 
+// SAFETY: There is no other global function with this name
+#[unsafe(no_mangle)]
 #[cfg(feature = "sandbox")]
-#[no_mangle]
 extern "system" fn Java_app_accrescent_ina_Patcher_enableSandbox(
     _env: JNIEnv,
     _class: JClass,

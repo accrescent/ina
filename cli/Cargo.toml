@@ -5,7 +5,7 @@
 [package]
 name = "cli"
 authors = ["Logan Magee"]
-edition = "2021"
+edition = "2024"
 license-file = "LICENSES/LicenseRef-Proprietary.txt"
 publish = false
 

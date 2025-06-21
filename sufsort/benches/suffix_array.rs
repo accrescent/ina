@@ -6,7 +6,7 @@
 
 use std::{fs::File, io::Read};
 
-use criterion::{criterion_group, criterion_main, BenchmarkId, Criterion, Throughput};
+use criterion::{BenchmarkId, Criterion, Throughput, criterion_group, criterion_main};
 use sufsort::SuffixArray;
 
 const DATA_PATH: &str = "benches/testdata/pizzachili-pitches.data";
