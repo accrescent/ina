@@ -23,7 +23,7 @@ jobs:
         with:
           distribution: temurin
           java-version: 21
-      - uses: gradle/actions/setup-gradle@v3
+      - uses: gradle/actions/setup-gradle@v4
       - run: rustup target add aarch64-linux-android x86_64-linux-android
       - run: ./gradlew build
       - run: ./gradlew dokkaGeneratePublicationHtml
