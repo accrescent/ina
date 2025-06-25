@@ -1,12 +1,12 @@
 # Copyright 2024 Logan Magee
 #
-# SPDX-License-Identifier: LicenseRef-Proprietary
+# SPDX-License-Identifier: MPL-2.0
 
 [package]
 name = "ina"
 authors = ["Logan Magee"]
 edition = "2024"
-license-file = "LICENSES/LicenseRef-Proprietary.txt"
+license = "MPL-2.0"
 publish = false
 
 [lib]

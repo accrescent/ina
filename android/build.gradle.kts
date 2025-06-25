@@ -1,6 +1,6 @@
 // Copyright 2024 Logan Magee
 //
-// SPDX-License-Identifier: LicenseRef-Proprietary
+// SPDX-License-Identifier: MPL-2.0
 
 import org.apache.tools.ant.taskdefs.condition.Os
 import org.apache.tools.ant.taskdefs.condition.Os.FAMILY_MAC

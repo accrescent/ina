@@ -1,7 +1,7 @@
 <!--
 Copyright 2023-2024 Logan Magee
 
-SPDX-License-Identifier: LicenseRef-Proprietary
+SPDX-License-Identifier: MPL-2.0
 -->
 
 # sufsort

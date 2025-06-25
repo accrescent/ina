@@ -1,6 +1,6 @@
 // Copyright 2024 Logan Magee
 //
-// SPDX-License-Identifier: LicenseRef-Proprietary
+// SPDX-License-Identifier: MPL-2.0
 
 plugins {
     alias(libs.plugins.jetbrains.kotlin.android) apply false

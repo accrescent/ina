@@ -1,7 +1,7 @@
 <!--
 Copyright 2024 Logan Magee
 
-SPDX-License-Identifier: LicenseRef-Proprietary
+SPDX-License-Identifier: MPL-2.0
 -->
 
 The binaries in this folder were sourced from the [Arch Linux Archive] and correspond to the
