@@ -3,7 +3,7 @@
 # SPDX-License-Identifier: MPL-2.0
 
 [package]
-name = "cli"
+name = "ina-cli"
 authors = ["Logan Magee"]
 edition = "2024"
 license = "MPL-2.0"
