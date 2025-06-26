@@ -1,5 +1,5 @@
 <!--
-Copyright 2023-2024 Logan Magee
+Copyright 2023 Logan Magee
 
 SPDX-License-Identifier: MPL-2.0
 -->
