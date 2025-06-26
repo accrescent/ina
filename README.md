@@ -10,6 +10,8 @@ Secure, robust, and efficient delta updates for executables.
 
 ## About
 
+[![Screenshot of terminal demo of the Ina CLI](https://asciinema.org/a/fqWlqviUBSPjOurGgaSpZW5G6.svg)](https://asciinema.org/a/fqWlqviUBSPjOurGgaSpZW5G6?autoplay=1)
+
 Ina is a CLI tool and set of libraries for creating and applying binary patches between files. It is
 especially well-suited for producing small patches between executable files and was designed for
 reducing the size of app updates in [Accrescent].
