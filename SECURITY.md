@@ -12,5 +12,8 @@ Only the latest version of Ina is supported.
 
 ## Reporting a vulnerability
 
-If you have a vulnerability to report, please email <security@accrescent.app>. Alternatively, DM
-Logan Magee on Matrix @lberrymage:matrix.org if you want end-to-end encryption.
+Ina's GitHub repository has [private vulnerability reporting] enabled. If you have a security issue
+to report, either [submit a report] privately on GitHub or email us at <security@accrescent.app>.
+
+[private vulnerability reporting]: https://github.blog/security/supply-chain-security/private-vulnerability-reporting-now-generally-available/
+[submit a report]: https://docs.github.com/en/code-security/security-advisories/guidance-on-reporting-and-writing-information-about-vulnerabilities/privately-reporting-a-security-vulnerability#privately-reporting-a-security-vulnerability
