@@ -7,6 +7,7 @@ import org.apache.tools.ant.taskdefs.condition.Os.FAMILY_MAC
 import org.apache.tools.ant.taskdefs.condition.Os.FAMILY_UNIX
 import org.apache.tools.ant.taskdefs.condition.Os.FAMILY_WINDOWS
 import org.jetbrains.dokka.gradle.DokkaTask
+import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 
 plugins {
     alias(libs.plugins.jetbrains.kotlin.android)
@@ -39,9 +40,6 @@ android {
         sourceCompatibility = JavaVersion.VERSION_1_8
         targetCompatibility = JavaVersion.VERSION_1_8
     }
-    kotlinOptions {
-        jvmTarget = "1.8"
-    }
 
     testOptions {
         managedDevices {
@@ -57,6 +55,10 @@ android {
 }
 
 kotlin {
+    compilerOptions {
+        jvmTarget = JvmTarget.JVM_1_8
+    }
+
     explicitApi()
 }
 
