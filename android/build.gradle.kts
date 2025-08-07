@@ -71,7 +71,7 @@ dependencies {
     testImplementation(libs.junit)
 }
 
-tasks.register("buildJniLibs") {
+tasks.register<Exec>("buildJniLibs") {
     // Obtain the host tag for the current system so we can find the proper toolchain directory
     //
     // https://developer.android.com/ndk/guides/other_build_systems#overview
@@ -83,50 +83,30 @@ tasks.register("buildJniLibs") {
     }
     val toolchainDir = "${android.ndkDirectory}/toolchains/llvm/prebuilt/$hostTag/bin"
     val api = inaMinSdk
-
     val aarch64CcPath = "$toolchainDir/aarch64-linux-android$api-clang"
     val x8664CcPath = "$toolchainDir/x86_64-linux-android$api-clang"
 
-    doFirst {
-        exec {
-            environment("AR", "$toolchainDir/llvm-ar")
-            environment("CARGO_TARGET_AARCH64_LINUX_ANDROID_LINKER", aarch64CcPath)
-            environment("CC_aarch64-linux-android", aarch64CcPath)
+    environment("AR", "$toolchainDir/llvm-ar")
+    environment("CARGO_TARGET_AARCH64_LINUX_ANDROID_LINKER", aarch64CcPath)
+    environment("CARGO_TARGET_X86_64_LINUX_ANDROID_LINKER", x8664CcPath)
+    environment("CC_aarch64-linux-android", aarch64CcPath)
+    environment("CC_x86_64-linux-android", x8664CcPath)
 
-            commandLine(
-                "cargo",
-                "build",
-                "-p",
-                "ina",
-                "--no-default-features",
-                "--features",
-                "java-ffi,patch,sandbox",
-                "--target",
-                "aarch64-linux-android",
-                "--profile",
-                "cdylib-release",
-            )
-        }
-        exec {
-            environment("AR", "$toolchainDir/llvm-ar")
-            environment("CARGO_TARGET_X86_64_LINUX_ANDROID_LINKER", x8664CcPath)
-            environment("CC_x86_64-linux-android", x8664CcPath)
-
-            commandLine(
-                "cargo",
-                "build",
-                "-p",
-                "ina",
-                "--no-default-features",
-                "--features",
-                "java-ffi,patch,sandbox",
-                "--target",
-                "x86_64-linux-android",
-                "--profile",
-                "cdylib-release",
-            )
-        }
-    }
+    commandLine(
+        "cargo",
+        "build",
+        "-p",
+        "ina",
+        "--no-default-features",
+        "--features",
+        "java-ffi,patch,sandbox",
+        "--target",
+        "aarch64-linux-android",
+        "--target",
+        "x86_64-linux-android",
+        "--profile",
+        "cdylib-release",
+    )
 
     doLast {
         copy {
