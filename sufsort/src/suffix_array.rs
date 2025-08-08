@@ -87,7 +87,7 @@ impl<'a> SuffixArray<'a> {
     /// assert_eq!(sa.longest_match(b"Red fish\0 swim").as_deref(), Some(b"Red fish\0".as_ref()));
     /// ```
     #[must_use]
-    pub fn longest_match(&self, pattern: &[u8]) -> Option<Substring> {
+    pub fn longest_match(&self, pattern: &[u8]) -> Option<Substring<'_>> {
         macro_rules! suffix {
             ($i: expr) => {
                 &self.data[$i as usize..]
