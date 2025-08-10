@@ -7,8 +7,10 @@ name = "sufsort"
 version = "0.1.0"
 authors = ["Logan Magee"]
 edition = "2024"
+description = "Suffix array construction for byte strings"
+repository = "https://github.com/accrescent/ina"
 license = "MPL-2.0"
-publish = false
+exclude = ["benches/testdata"]
 
 [dependencies]
 bytemuck = "1.15.0"

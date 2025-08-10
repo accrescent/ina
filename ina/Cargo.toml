@@ -7,8 +7,10 @@ name = "ina"
 version = "0.1.0"
 authors = ["Logan Magee"]
 edition = "2024"
+description = "Secure, robust, and efficient delta updates for executables"
+repository = "https://github.com/accrescent/ina"
 license = "MPL-2.0"
-publish = false
+exclude = ["tests/testdata"]
 
 [lib]
 crate-type = ["cdylib", "lib"]
@@ -19,7 +21,7 @@ byteorder = "1.5.0"
 integer-encoding = "4.0.0"
 jni = { version = "0.21.1", optional = true }
 seccompiler = { version = "0.5.0", optional = true }
-sufsort = { path = "../sufsort", optional = true }
+sufsort = { path = "../sufsort", version = "0.1.0", optional = true }
 zstd = { version = "0.13.1", default-features = false }
 
 [target.'cfg(all(target_os = "android", target_endian = "little", any(target_arch = "aarch64", target_arch = "x86_64")))'.dependencies]

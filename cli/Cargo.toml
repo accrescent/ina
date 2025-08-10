@@ -7,8 +7,9 @@ name = "ina-cli"
 version = "0.1.0"
 authors = ["Logan Magee"]
 edition = "2024"
+description = "Secure, robust, and efficient delta updates for executables"
+repository = "https://github.com/accrescent/ina"
 license = "MPL-2.0"
-publish = false
 
 [[bin]]
 name = "ina"
@@ -17,4 +18,4 @@ path = "src/main.rs"
 [dependencies]
 anyhow = "1.0.82"
 clap = { version = "4.5.4", features = ["derive"] }
-ina = { path = "../ina" }
+ina = { path = "../ina", version = "0.1.0" }
