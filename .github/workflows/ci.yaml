@@ -6,6 +6,9 @@ name: Check code
 
 on: [push, pull_request]
 
+permissions:
+  contents: read
+
 env:
   RUSTFLAGS: "-Dwarnings"
 
