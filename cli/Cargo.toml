@@ -1,6 +1,6 @@
 # Copyright 2024 Logan Magee
 #
-# SPDX-License-Identifier: MPL-2.0
+# SPDX-License-Identifier: Apache-2.0
 
 [package]
 name = "ina-cli"
@@ -9,7 +9,7 @@ authors = ["Logan Magee"]
 edition = "2024"
 description = "Secure, robust, and efficient delta updates for executables"
 repository = "https://github.com/accrescent/ina"
-license = "MPL-2.0"
+license = "Apache-2.0"
 
 [[bin]]
 name = "ina"

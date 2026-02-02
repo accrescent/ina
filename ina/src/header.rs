@@ -1,6 +1,6 @@
 // Copyright 2024 Logan Magee
 //
-// SPDX-License-Identifier: MPL-2.0
+// SPDX-License-Identifier: Apache-2.0
 
 pub(crate) const MAGIC: u32 = 0x5c956c7c;
 pub(crate) const VERSION_MAJOR: u16 = 1;

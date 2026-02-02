@@ -1,6 +1,6 @@
 // Copyright 2023 Logan Magee
 //
-// SPDX-License-Identifier: MPL-2.0
+// SPDX-License-Identifier: Apache-2.0
 
 use alloc::{vec, vec::Vec};
 use core::mem;

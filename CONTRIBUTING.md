@@ -48,7 +48,7 @@ a new file, be sure to add the following header in a code comment:
 ```
 Copyright <current-year> Logan Magee
 
-SPDX-License-Identifier: MPL-2.0
+SPDX-License-Identifier: Apache-2.0
 ```
 
 ## Vulnerability reports
