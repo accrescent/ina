@@ -1,4 +1,4 @@
-// Copyright 2024 Logan Magee
+// SPDX-FileCopyrightText: © 2024 Logan Magee
 //
 // SPDX-License-Identifier: Apache-2.0
 
