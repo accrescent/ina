@@ -3,7 +3,7 @@
 # SPDX-License-Identifier: Apache-2.0
 
 [versions]
-agp = "8.12.0"
+agp = "8.13.2"
 androidx-test = "1.7.0"
 dokka = "2.0.0"
 junit = "4.13.2"
