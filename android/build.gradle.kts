@@ -6,11 +6,9 @@ import org.apache.tools.ant.taskdefs.condition.Os
 import org.apache.tools.ant.taskdefs.condition.Os.FAMILY_MAC
 import org.apache.tools.ant.taskdefs.condition.Os.FAMILY_UNIX
 import org.apache.tools.ant.taskdefs.condition.Os.FAMILY_WINDOWS
-import org.jetbrains.dokka.gradle.DokkaTask
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 
 plugins {
-    alias(libs.plugins.jetbrains.kotlin.android)
     alias(libs.plugins.android.library)
     alias(libs.plugins.dokka)
 }
@@ -81,7 +79,8 @@ tasks.register<Exec>("buildJniLibs") {
         Os.isFamily(FAMILY_WINDOWS) -> "windows-x86_64"
         else -> throw TaskExecutionException(this, Exception("unsupported host platform"))
     }
-    val toolchainDir = "${android.ndkDirectory}/toolchains/llvm/prebuilt/$hostTag/bin"
+    val ndkDir = androidComponents.sdkComponents.ndkDirectory.get().asFile
+    val toolchainDir = "$ndkDir/toolchains/llvm/prebuilt/$hostTag/bin"
     val api = inaMinSdk
     val aarch64CcPath = "$toolchainDir/aarch64-linux-android$api-clang"
     val x8664CcPath = "$toolchainDir/x86_64-linux-android$api-clang"
@@ -134,13 +133,13 @@ tasks.clean {
     delete(fileTree("$projectDir/src/main/jniLibs"))
 }
 
-tasks.withType<DokkaTask>().configureEach {
-    failOnWarning.set(true)
+dokka {
+    dokkaPublications.configureEach {
+        failOnWarning.set(true)
+        suppressInheritedMembers.set(true)
+    }
 
-    dokkaSourceSets {
-        configureEach {
-            reportUndocumented.set(true)
-            suppressInheritedMembers.set(true)
-        }
+    dokkaSourceSets.configureEach {
+        reportUndocumented.set(true)
     }
 }
