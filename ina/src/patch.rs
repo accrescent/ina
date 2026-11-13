@@ -159,17 +159,22 @@ where
         while !buf.is_empty() {
             let read = match self.state {
                 PatcherState::AtNextControl => {
-                    // Next is a control add field. Read the length of it and continue.
-                    match self.patch.read_varint() {
-                        Ok(add_len) => {
-                            self.state = PatcherState::Add(add_len);
-                            0
-                        }
-                        Err(e) => match e.kind() {
-                            ErrorKind::UnexpectedEof => break,
-                            _ => return Err(e),
-                        },
+                    // Next is a control add field. Read the length of it and continue. The patch
+                    // ends only where a control could start, a length that cannot be read is an
+                    // error.
+                    let mut first = [0; 1];
+                    if self.patch.read(&mut first)? == 0 {
+                        break;
                     }
+                    let add_len = first.chain(&mut self.patch).read_varint().map_err(|e| {
+                        if e.kind() == ErrorKind::UnexpectedEof {
+                            io::Error::new(ErrorKind::InvalidData, "invalid control length")
+                        } else {
+                            e
+                        }
+                    })?;
+                    self.state = PatcherState::Add(add_len);
+                    0
                 }
                 PatcherState::Add(add_len) => {
                     // We're currently reading an add field, so read `len` bytes from both the old
