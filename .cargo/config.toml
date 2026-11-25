@@ -2,6 +2,9 @@
 #
 # SPDX-License-Identifier: Apache-2.0
 
+[registry]
+global-min-publish-age = "3 days"
+
 [target.aarch64-linux-android]
 rustflags = ["-C", "link-args=-Wl,-z,max-page-size=16384"]
 
